@@ -1,0 +1,50 @@
+
+
+/* Um exemplo de funcao que invoca o parser */
+int run(FILE *f, Program *prog, char *filename){
+
+    /* Redirecionando entrada do parser */
+    yyin = f;
+
+    /* Tabelas de variaveis e de funcoes */
+    vartable = newHash(HASH_SIZE, hashVar); // libera no final
+    funtable = createFunctionTable();       // libera no final
+
+
+    /* Inicializa variaveis... */
+
+
+    /* Restaurando contador de linhas */
+    line = 1;
+
+    /* Iniciando com condicao de err 0 */
+    err = 0;
+
+    /* Parser */
+    yyparse();
+
+
+    /* Liberando variaveis */
+
+
+    /* Reinicia o buffer do flex */
+    YY_FLUSH_BUFFER;
+
+    /* Se nao ocorreu erros, retorna 1 (sucesso) cria uma estrutura programa e apresenta mensagem */
+    if (err == 0) {
+        throwOkMsg();
+        *prog = newProgram(executed, vartable, funtable, programname, filename);
+        return 1;
+    } else if (err == 1) {
+        freeExecuted(executed); /* Libera o espaco de memoria alocado para uma lista de execucao */
+        return 0;
+    }
+}
+
+/* rotina chamada por yyparse quando encontra erro sintatico */
+int yyerror (){
+    printf("Erro de sintaxe na linha %d.\n", line);
+    err = 1;
+}
+
+

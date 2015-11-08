@@ -1,0 +1,52 @@
+
+No programa principal:
+
+...
+
+
+	if (opcao == 1) {
+			printf("\nOpcao 1 – Compilar Programa\n");
+			programa = (char *) calloc(TAM, sizeof(char));
+			printf("Digite o nome do programa: \n");
+			scanf("%[^\n]", programa);
+			scanf("%c", &lixo);
+
+			printf("Abrindo %s\n", programa);
+
+			//compila o arquivo digitado
+			listaArvore = compila(programa);
+
+
+....
+		
+
+
+No bison voce tera criado a seguinte funcao: 
+
+ListaArvore *compila(char *nome_programa) {
+
+	yyin = abre_arquivo(nome_programa, "r");
+	if (yyin == NULL) return NULL;
+	programa = nome_programa;
+
+	...
+
+	yyparse();
+
+	...
+
+	fclose(yyin);
+	return listaArv;
+}
+
+
+
+FILE *abre_arquivo(char *filename, char *modo) {
+	FILE *file;
+
+	if (!(file = fopen(filename, modo))) {
+		printf("Erro na abertura do arquivo %s\n", filename);
+	}
+	return file;
+}
+
