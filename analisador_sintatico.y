@@ -1,6 +1,7 @@
 %{
 #include <stdio.h>
 #include "hash.h"
+#include "Pilha.h"
 
 #define TIPO_OPERADOR_LOGICO 1
 #define TIPO_OPERADOR_ARITMETICO 2
@@ -22,16 +23,19 @@
     Funcao* funcao = NULL;
     int tipoExpressaoAtribuicao;
     int tipoRetornoFuncao;
+    Pilha* p = NULL;
+    Arvore* arvoreExpressao = NULL;
+
 
     void liberarMemoriaAlocada() {
-	hashVariavel = liberarMemoriaTabelaHash(hashVariavel);
+    hashVariavel = liberarMemoriaTabelaHash(hashVariavel);
         hashFuncao = liberarMemoriaTabelaHash(hashFuncao);
         variaveis = liberarMemoriaLista(variaveis);
-	variaveisFuncao = liberarMemoriaLista(variaveisFuncao);
+    variaveisFuncao = liberarMemoriaLista(variaveisFuncao);
         dimensoesMatriz = liberarMemoriaLista(dimensoesMatriz);
         expressao = liberarMemoriaLista(expressao);
         operadores = liberarMemoriaLista(operadores);
-	parametrosFuncao = liberarMemoriaLista(parametrosFuncao);
+    parametrosFuncao = liberarMemoriaLista(parametrosFuncao);
     }
 
     void finalizarProgramaComErro(char* erro) {
@@ -202,7 +206,7 @@ DECLARACAO_VARIAVEL_GERAL
 
 LISTA_VARIAVEIS
     : LISTA_VARIAVEIS token_simboloVirgula token_identificador{
-	
+    
         Variavel* var = criarNovaVariavel(identificador, NULL, tipo, escopo, line_num) ;
         Lista* l = criarNovoNoLista(TIPO_VARIAVEL, var, variaveis);
         variaveis = l;
@@ -217,18 +221,18 @@ LISTA_VARIAVEIS
 DECLARACAO_FUNCAO
     : DECLARACAO_FUNCAO token_funcao token_identificador{
         if (buscarFuncaoTabelaHash(hashFuncao, identificador) != NULL) {
-			finalizarProgramaComErro("Funcao ja declarada");
-    	}
-		funcao = criarFuncao(identificador);
-		strcpy(escopo, identificador);
+            finalizarProgramaComErro("Funcao ja declarada");
+        }
+        funcao = criarFuncao(identificador);
+        strcpy(escopo, identificador);
     } DECLARACAO_FUNCAO_ARGUMENTOS
 
     | token_funcao token_identificador{
-		if (buscarFuncaoTabelaHash(hashFuncao, identificador) != NULL) {
-			finalizarProgramaComErro("Funcao ja declarada");
-    	}
+        if (buscarFuncaoTabelaHash(hashFuncao, identificador) != NULL) {
+            finalizarProgramaComErro("Funcao ja declarada");
+        }
         funcao = criarFuncao(identificador);
-		strcpy(escopo, identificador);
+        strcpy(escopo, identificador);
     } DECLARACAO_FUNCAO_ARGUMENTOS
     ;
 
@@ -244,7 +248,7 @@ DECLARACAO_FUNCAO_ARGUMENTOS2
     } ROTINA_FUNCAO token_fimFuncao
     | {
         hashFuncao = inserirFuncaoTabelaHash(funcao, variaveisFuncao, TIPO_VOID, hashFuncao);
-	variaveisFuncao = liberarMemoriaLista(variaveisFuncao);
+    variaveisFuncao = liberarMemoriaLista(variaveisFuncao);
     } ROTINA_FUNCAO token_fimFuncao
     ;
 
@@ -255,7 +259,7 @@ PARAMETRO_DECLARACAO_FUNCAO
         Variavel* var = criarNovaVariavel(nomeVariavel, NULL, tipo, escopo, line_num) ;
         Lista* l = criarNovoNoListaFim(TIPO_VARIAVEL, var, variaveisFuncao);
         variaveisFuncao = l;
-	hashVariavel = inserirVariavelTabelaHash(hashVariavel, var, NULL, tipo, escopo);
+    hashVariavel = inserirVariavelTabelaHash(hashVariavel, var, NULL, tipo, escopo);
     } 
     | token_identificador{
         strcpy(nomeVariavel, identificador);
@@ -263,7 +267,7 @@ PARAMETRO_DECLARACAO_FUNCAO
         Variavel* var = criarNovaVariavel(nomeVariavel, NULL, tipo, escopo, line_num) ;
         Lista* l = criarNovoNoListaFim(TIPO_VARIAVEL, var, variaveisFuncao);
         variaveisFuncao = l;
-	hashVariavel = inserirVariavelTabelaHash(hashVariavel, var, NULL, tipo, escopo);
+    hashVariavel = inserirVariavelTabelaHash(hashVariavel, var, NULL, tipo, escopo);
     }
     ;
 
@@ -360,6 +364,9 @@ COMANDO_ATRIBUICAO
     :  token_identificador {
         Variavel* v = validarIdentificadorSairCasoInvalido();
         tipoExpressaoAtribuicao = getTipoVariavel(v);
+        Arvore* novoNo = inicializaArvore(TIPO_VARIAVEL, v);
+        arvoreExpressao = inicializaArvore(TIPO_LITERAL, "=");
+        arvoreExpressao = setFilhosEsquerdaCentroDireita(arvoreExpressao, novoNo, NULL, NULL);
     } 
     token_operadorAtribuicao COMANDO_ATRIBUICAO2
     | token_identificador POSICAO_MATRIZ{
@@ -393,19 +400,25 @@ VALOR_A_SER_ATRIBUIDO
             finalizarProgramaComErro("Tipo invalido associado a variavel");
         }
         expressao = liberarMemoriaLista(expressao);
+
+        Arvore* ArvExp = getArvoreTopoPilha(p);
+        p = desempilhar(p);
+        arvoreExpressao = setFilhosEsquerdaCentroDireita(arvoreExpressao, NULL, ArvExp, NULL);
+       // print_t(ArvExp);
+        arvore_imprime_profundidade(arvoreExpressao, 0 );
     }
     | VALOR_A_SER_ATRIBUIDO COMANDO_CHAMADA_FUNCAO {
-		int tipoRetornoFuncao = getTipoRetornoFuncao(hashFuncao, funcao);
-		if(tipoRetornoFuncao != tipoExpressaoAtribuicao){
-			finalizarProgramaComErro("Tipo invalido associado a variavel");
-		}
-	}
+        int tipoRetornoFuncao = getTipoRetornoFuncao(hashFuncao, funcao);
+        if(tipoRetornoFuncao != tipoExpressaoAtribuicao){
+            finalizarProgramaComErro("Tipo invalido associado a variavel");
+        }
+    }
     | COMANDO_CHAMADA_FUNCAO {
-		int tipoRetornoFuncao = getTipoRetornoFuncao(hashFuncao, funcao);
-		if(tipoRetornoFuncao != tipoExpressaoAtribuicao){
-			finalizarProgramaComErro("Tipo invalido associado a variavel");
-		}
-	}
+        int tipoRetornoFuncao = getTipoRetornoFuncao(hashFuncao, funcao);
+        if(tipoRetornoFuncao != tipoExpressaoAtribuicao){
+            finalizarProgramaComErro("Tipo invalido associado a variavel");
+        }
+    }
     ;
 
 COMANDO_ENQUANTO
@@ -482,17 +495,17 @@ COMANDO_IMPRIMA
 
 PARAMETROS_FUNCAO
     : PARAMETROS_FUNCAO token_simboloVirgula POSSIVEIS_PARAMETROS {
-    	parametrosFuncao = criarNovoNoListaFim(tipo, yytext, parametrosFuncao);
+        parametrosFuncao = criarNovoNoListaFim(tipo, yytext, parametrosFuncao);
     }
     | POSSIVEIS_PARAMETROS {
-	   parametrosFuncao = criarNovoNoListaFim(tipo, yytext, parametrosFuncao);
+       parametrosFuncao = criarNovoNoListaFim(tipo, yytext, parametrosFuncao);
     }
     ;
 
 POSSIVEIS_PARAMETROS
     : token_identificador {
-	   Variavel* v = validarIdentificadorSairCasoInvalido();
-	   tipo = getTipoVariavel(v);
+       Variavel* v = validarIdentificadorSairCasoInvalido();
+       tipo = getTipoVariavel(v);
     }
     | NUMERO 
     | ACESSO_MATRIZ 
@@ -510,10 +523,10 @@ COMANDO_CHAMADA_FUNCAO
         }
         parametrosFuncao = liberarMemoriaLista(parametrosFuncao);
     } COMANDO_CHAMADA_FUNCAO2 {
-    	if(isChamadaFuncaoValida(funcao, parametrosFuncao) == 0){
-	       finalizarProgramaComErro("Parametros passados na chamada de funcao nao condizem com a declaracao");
-	   }
-	   parametrosFuncao = liberarMemoriaLista(parametrosFuncao);
+        if(isChamadaFuncaoValida(funcao, parametrosFuncao) == 0){
+           finalizarProgramaComErro("Parametros passados na chamada de funcao nao condizem com a declaracao");
+       }
+       parametrosFuncao = liberarMemoriaLista(parametrosFuncao);
     }
     ;
 
@@ -539,27 +552,58 @@ COMANDO_MAIS_MAIS_MENOS_MENOS
 
 EXPRESSAO
     : EXPRESSAO_SIMPLES
-    | EXPRESSAO_SIMPLES OPERADORES_RELACIONAIS {
+    | EXPRESSAO_SIMPLES token_operadorIgualIgual {
         operadores = criarNovoNoListaFim(TIPO_OPERADOR_LOGICO, NULL, operadores);
     } EXPRESSAO_SIMPLES 
-	;
+    | EXPRESSAO_SIMPLES token_operadorMenor {
+        operadores = criarNovoNoListaFim(TIPO_OPERADOR_LOGICO, NULL, operadores);
+    } EXPRESSAO_SIMPLES 
+    | EXPRESSAO_SIMPLES token_operadorMenorIgual {
+        operadores = criarNovoNoListaFim(TIPO_OPERADOR_LOGICO, NULL, operadores);
+    } EXPRESSAO_SIMPLES 
+    | EXPRESSAO_SIMPLES token_operadorMaiorIgual {
+        operadores = criarNovoNoListaFim(TIPO_OPERADOR_LOGICO, NULL, operadores);
+    } EXPRESSAO_SIMPLES 
+    | EXPRESSAO_SIMPLES token_operadorMaior {
+        operadores = criarNovoNoListaFim(TIPO_OPERADOR_LOGICO, NULL, operadores);
+    } EXPRESSAO_SIMPLES 
+    | EXPRESSAO_SIMPLES token_operadorDiferente {
+        operadores = criarNovoNoListaFim(TIPO_OPERADOR_LOGICO, NULL, operadores);
+    } EXPRESSAO_SIMPLES 
+    ;
 
 EXPRESSAO_SIMPLES
     : TERMO
-    | EXPRESSAO_SIMPLES OPERADORES_BAIXA_PRECEDENCIA_ARITMETICOS {
+    | EXPRESSAO_SIMPLES token_operadorMais {
         operadores = criarNovoNoListaFim(TIPO_OPERADOR_ARITMETICO, NULL, operadores);
-    } TERMO {printf(" + ");}
-	| EXPRESSAO_SIMPLES OPERADORES_BAIXA_PRECEDENCIA_LOGICOS {
+    } TERMO {
+        p = empilharExpressaoOperador(p, "+");
+    }
+    | EXPRESSAO_SIMPLES token_operadorMenos {
+        operadores = criarNovoNoListaFim(TIPO_OPERADOR_ARITMETICO, NULL, operadores);
+    } TERMO
+    | EXPRESSAO_SIMPLES token_operadorOu {
         operadores = criarNovoNoListaFim(TIPO_OPERADOR_LOGICO, NULL, operadores);
     } TERMO
     ;
 
 TERMO
     : FATOR
-    | TERMO OPERADORES_ALTA_PRECEDENCIA_ARITMETICOS {
+    | TERMO token_operadorVezes {
         operadores = criarNovoNoListaFim(TIPO_OPERADOR_ARITMETICO, NULL, operadores);
-    } FATOR {printf(" * ");}
-	| TERMO OPERADORES_ALTA_PRECEDENCIA_LOGICOS {
+    } FATOR {
+        p = empilharExpressaoOperador(p, "*");
+    }
+    | TERMO token_operadorDividir {
+        operadores = criarNovoNoListaFim(TIPO_OPERADOR_ARITMETICO, NULL, operadores);
+    } FATOR
+    | TERMO token_operadorPorcento {
+        operadores = criarNovoNoListaFim(TIPO_OPERADOR_ARITMETICO, NULL, operadores);
+    } FATOR
+    | TERMO token_operadorPotencia {
+        operadores = criarNovoNoListaFim(TIPO_OPERADOR_ARITMETICO, NULL, operadores);
+    } FATOR
+    | TERMO token_operadorE {
         operadores = criarNovoNoListaFim(TIPO_OPERADOR_LOGICO, NULL, operadores);
     } FATOR
     ;
@@ -567,15 +611,15 @@ TERMO
 
 FATOR
     : token_identificador {
-	   //variavel declarada		
-	   Variavel* v = validarIdentificadorSairCasoInvalido();
+       //variavel declarada     
+       Variavel* v = validarIdentificadorSairCasoInvalido();
         tipo = getTipoVariavel(v);
         expressao = criarNovoNoListaFim(tipo, yytext, expressao);
     }
     | NUMERO
     | ACESSO_MATRIZ
     | LOGICO {
-	    tipo = TIPO_LOGICO; 
+        tipo = TIPO_LOGICO; 
         expressao = criarNovoNoListaFim(TIPO_LOGICO, NULL, expressao);
     }
     | CARACTERE_LITERAL
@@ -584,13 +628,18 @@ FATOR
 
 NUMERO
     : INTEIRO {
-	tipo = TIPO_INTEIRO;
+    tipo = TIPO_INTEIRO;
         expressao = criarNovoNoListaFim(TIPO_INTEIRO, NULL, expressao);
-		printf(" %s ", yytext);
+        int i = atoi(yytext);
+        Arvore *novoNo = inicializaArvore(TIPO_INTEIRO, &i);
+        p = empilhar(p, novoNo);
     }
     | REAL {
-	tipo = TIPO_REAL;
+    tipo = TIPO_REAL;
         expressao = criarNovoNoListaFim(TIPO_REAL, NULL, expressao);
+        float i = atof(yytext)
+        Arvore *novoNo = inicializaArvore(TIPO_REAL, &i);
+        p = empilhar(p, novoNo);
     }
     ;
 
@@ -612,10 +661,10 @@ LOGICO
 
 CARACTERE_LITERAL
     : token_literal {
-	tipo = TIPO_LITERAL;
+    tipo = TIPO_LITERAL;
     }
     | token_caractere {
-	tipo = TIPO_CARACTERE;
+    tipo = TIPO_CARACTERE;
     }
     ;
 
@@ -629,35 +678,6 @@ ACESSO_MATRIZ
         dimensoesMatriz = liberarMemoriaLista(dimensoesMatriz);
     }
     ;
-
-OPERADORES_RELACIONAIS
-    : token_operadorIgualIgual
-    | token_operadorMenor
-    | token_operadorMenorIgual
-    | token_operadorMaiorIgual
-    | token_operadorMaior
-    | token_operadorDiferente
-    ;
-
-OPERADORES_BAIXA_PRECEDENCIA_ARITMETICOS
-	: token_operadorMais
-    | token_operadorMenos
-	;
-
-OPERADORES_BAIXA_PRECEDENCIA_LOGICOS
-	: token_operadorOu
-	;
-
-OPERADORES_ALTA_PRECEDENCIA_ARITMETICOS
-	: token_operadorVezes
-    | token_operadorDividir
-    | token_operadorPorcento
-    | token_operadorPotencia
-	;
-
-OPERADORES_ALTA_PRECEDENCIA_LOGICOS
-	: token_operadorE
-	;
 
 %%
 

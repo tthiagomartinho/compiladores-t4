@@ -221,6 +221,10 @@ void setVariavelUsada(Variavel* v) {
     v->usada = -1;
 }
 
+char* getNomeVariavel(Variavel* v){
+    return v->nome;
+}
+
 /**************************MANIPULACAO TABELA HASH DE VARIAVEIS*****************/
 
 /*Cria um novo objeto na tabela Hash

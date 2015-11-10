@@ -44,6 +44,8 @@ int getTipoVariavel(Variavel* variavel);
 
 void setVariavelUsada(Variavel* v);
 
+char* getNomeVariavel(Variavel* v);
+
 /**************************MANIPULACAO TABELA HASH DE VARIAVEIS*****************/
 
 Lista** inserirVariavelTabelaHash(Lista** tabelaHash, Variavel* v, Lista* dimensoesMatriz, int tipo, char* escopo);

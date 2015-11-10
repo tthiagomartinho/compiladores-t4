@@ -1,0 +1,35 @@
+/*
+  Algoritmo Teste 3
+*/
+  
+algoritmo teste3;
+
+variaveis
+  string, string2 : literal;
+  x, y : real;
+  z : inteiro;
+fim-variaveis
+
+funcao fatorial (x : inteiro) : 
+	aux : inteiro;
+inicio
+	se x == 1 entao
+		retorne 1;
+	senao
+		aux = x - 1;
+		aux =  fatorial(aux);
+		retorne x * aux;
+	fim-se
+fim
+fim-funcao
+ 
+inicio
+	string = "o fatorial de ";
+	string2 = " vale ";
+	z = leia();
+	z = fatorial(z);
+	imprima(string);
+	imprima(x);
+	imprima(string2);
+	imprima(y);
+fim

@@ -1,0 +1,76 @@
+/*
+  Algoritmo Teste 1
+*/
+  
+algoritmo teste1;
+
+variaveis
+  valor1, valor2 : real;
+  res : inteiro;
+  operacao : inteiro;
+fim-variaveis
+
+funcao adicao (v1 : real, v2 : real) : real
+  total : real;
+  inicio
+    total = v1 + v2;
+    retorne (total);
+  fim
+fim-funcao
+
+funcao subtracao (v1: real, v2: real) : real
+  total : real;
+  
+  inicio
+    total = v1 - v2;
+    retorne (total);
+  fim
+fim-funcao
+
+funcao multiplicacao (v1 : real, v2 : real) : real
+  total : real;
+  
+  inicio
+    total = v1*v2;
+    retorne (total);
+  fim
+fim-funcao
+
+funcao divisao (v1 : real, v2 : real) : real
+  total : real;
+  
+  inicio
+    total = v1 / v2;
+    retorne (total);
+  fim
+fim-funcao
+
+inicio
+
+  imprima ("**** Calculadora de 4 Operações Básicas ****");
+  imprima ("Digite valor 1: ");
+  valor1 = 10;
+  imprima (valor1);
+  
+  imprima ("Digite valor 2: ");
+  valor2 = 5;
+  imprima (valor2);
+  
+  imprima ("Operação a ser realizada sobre os valores: ");
+  imprima ("1 - Somar");
+  imprima ("2 - Subtrair");
+  imprima ("3 - Multiplicar");
+  imprima ("4 - Dividir");
+  imprima ("0 - Sair");
+  imprima ("Escolha uma opção: ");
+  operacao = 1;
+  
+  se (operacao == 1) entao
+    res = adicao(valor1, valor2);
+  senao 
+    se (operacao == 2) entao
+      res = subtracao (valor1, valor2);
+    fim-se
+  fim-se
+  imprima ("Resultado: ", res);
+fim

@@ -1,0 +1,15 @@
+/*
+  Algoritmo Teste 1
+*/
+  
+algoritmo teste1;
+
+variaveis
+  valor1, valor2 : real;
+  res : inteiro;
+  operacao : inteiro;
+fim-variaveis
+
+inicio
+  operacao = 10 + 20*50;
+fim

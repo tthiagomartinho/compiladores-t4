@@ -1,0 +1,56 @@
+/*
+  Algoritmo Teste 2
+*/
+  
+algoritmo teste2;
+
+variaveis
+  m1, m2, m3 : matriz[10][10] de inteiro;
+  v1, v2 : matriz[10] de inteiro;
+  string : literal;
+  valorLogico : logico;
+  media : inteiro;
+  x,inicioVetor : inteiro;
+fim-variaveis
+
+
+inicio
+  para x de 0 ate 10 faca 
+    v1[4] = 0;
+    m1[4][4] = 1;
+    m2[5][10] = 2 + m2[5][1];
+    m3[7][6] = 3 + m1[4][4] + m2[5][6];
+  fim-para
+
+  v1[0] = m3[1][1] + m1[4][4] + m2[7][7];
+  se v1[1] > 5 entao
+      se v1[0] == 6 entao
+        media = (v1[0] + v1[1])/2;
+        se media < 2 entao
+          imprima("A media eh ");
+          imprima(media);
+        senao
+          media++;
+        fim-se
+      fim-se
+  senao
+      inicioVetor = v1[0];
+      avalie (inicioVetor):
+        caso 1:
+          v1[0] = v1[0]*2;
+          pare;
+        caso 2:
+          v1[0] = v1[0]*5;
+          pare;
+        caso 3:
+          v1[0] = v1[0]*6;
+          pare;
+        caso 4:
+          v1[0] = v1[0]*10;
+          pare;
+        caso 5:
+          v1[0] = v1[0]*7;
+          pare;
+      fim-avalie
+  fim-se
+fim

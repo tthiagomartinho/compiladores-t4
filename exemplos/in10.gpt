@@ -1,0 +1,195 @@
+/*
+  Algoritmo Teste 1
+*/
+  
+algoritmo teste1;
+
+variaveis
+  valor1, valor2 : real;
+  res : inteiro;
+  operacao : inteiro;
+  m1, m2, m3 : matriz[10][10] de inteiro;
+  v, v1, v2 : matriz[10] de inteiro;
+  string, string2 : literal;
+  valorLogico,w, l  : logico;
+  media : inteiro;
+  x, y : real;
+  k : inteiro;
+fim-variaveis
+
+funcao adicao (v1 : real, v2 : real) : real
+  total : real;
+  inicio
+    total = v1 + v2;
+    retorne (total);
+  fim
+fim-funcao
+
+funcao subtracao (v1: real, v2: real) : real
+  total : real;
+  
+  inicio
+    total = v1 - v2;
+    retorne (total);
+  fim
+fim-funcao
+
+funcao subtracao (v1: inteiro, v2: inteiro) : inteiro
+  total : inteiro;
+  
+  inicio
+    total = v1 - v2;
+    retorne (total);
+  fim
+fim-funcao
+
+funcao multiplicacao (v1 : real, v2 : real) : real
+  total : real;
+  
+  inicio
+    total = v1*v2;
+    retorne (total);
+  fim
+fim-funcao
+
+funcao divisao (v1 : real, v2 : real) : real
+  total : real;
+  
+  inicio
+    total = v1 / v2;
+    retorne (total);
+  fim
+fim-funcao
+
+funcao fatorial (x : inteiro) : inteiro
+	aux : inteiro;
+  inicio
+  	 se x == 1 entao
+  		retorne 1;
+  	 senao
+      aux = x - 1;
+  		aux =  fatorial(aux);
+  		retorne x * aux;
+  	   fim-se
+    fim
+fim-funcao
+
+funcao imprimeMedia(x: inteiro, y : inteiro) :
+  inicio
+  	imprima("A media eh ");
+    x = ((x + y)/2);
+    imprima(x);
+    retorne;
+  fim
+fim-funcao
+
+inicio
+
+  imprima ("**** Calculadora de 4 Operações Básicas ****");
+  imprima ("Digite valor 1: ");
+  valor1 = 10.1;
+  imprima (valor1);
+  
+  imprima ("Digite valor 2: ");
+  valor2 = 5.2;
+  imprima (valor2);
+  
+  imprima ("Operação a ser realizada sobre os valores: ");
+  imprima ("1 - Somar");
+  imprima ("2 - Subtrair");
+  imprima ("3 - Multiplicar");
+  imprima ("4 - Dividir");
+  imprima ("0 - Sair");
+  imprima ("Escolha uma opção: ");
+  operacao = 1;
+  
+  se (operacao == 1) entao
+    res = adicao(valor1, valor2);
+  senao 
+    se (operacao == 2) entao
+      res = subtracao (valor1, valor2);
+    fim-se
+  fim-se
+  imprima ("Resultado: ");
+  imprima(res);
+
+  para k de 0 ate 10 faca 
+    v1[4] = 0;
+    m1[4][4] = 1;
+    m2[5][6] = 2 + m2[5][1];
+    m3[7][6] = 3 + m1[4][4] + m2[5][6];
+  fim-para
+
+  v[0] = m3[1][1] + m1[4][4] + m2[7][7];
+  v1[0] = m3[1][1] + m1[4][4] + m2[7][7];
+  se v1[1] > 5 entao
+      se v1[0] == 6 entao
+        media = (v1[0] + v1[1])/2;
+        se media < 2 entao
+          imprima("A media eh ");
+          imprima(media);
+        senao
+          media++;
+        fim-se
+      fim-se
+  senao
+      media = v1[0];
+      avalie (media):
+        caso 1:
+          v1[0] = v1[0]*2;
+          pare;
+        caso 2:
+          v1[0] = v1[0]*5;
+          pare;
+        caso 3:
+          v1[0] = v1[0]*6;
+          pare;
+        caso 4:
+          v1[0] = v1[0]*10;
+          pare;
+        caso 5:
+          v1[0] = v1[0]*7;
+          pare;
+      fim-avalie
+  fim-se
+
+  	string = "o fatorial de ";
+	string2 = " vale ";
+	x = leia();
+	y = fatorial(k);
+	imprima(string);
+  imprima(x);
+  imprima(string2);
+  imprima(y);
+
+	x = leia();
+	k = k^2 ;
+	enquanto k > 0 faca
+		k--;
+		imprima("Tempo restante ");
+    imprima(y);
+	fim-enquanto
+
+	faca:
+		y--;
+		imprima("Tempo restante ");
+    imprima(y);
+	enquanto (y > 0.0)
+	fim-enquanto
+
+	x = x % y;
+  l = x > 7.1;
+  w = x < 10.2;
+  l = nao (l) ou w;
+  l = x == 3.3;
+
+  k = maximo(1, 2);
+  k = minimo(1, 2);
+  k = central(1, 2, 3);
+  x = centralReal(1.1, 2.2, 3.33);
+  x = maximoReal(1.1, 2.2);
+  x = minimoReal(1.1, 2.2);
+
+	imprima("l eh ");
+  imprima(l);
+fim
