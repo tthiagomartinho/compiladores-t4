@@ -225,6 +225,15 @@ char* getNomeVariavel(Variavel* v){
     return v->nome;
 }
 
+void* getValorVariavel(Variavel* v){
+    return v->valor;
+}
+
+char* getEscopoVariavel(Variavel* v){
+    return v->escopo;
+}
+
+
 /**************************MANIPULACAO TABELA HASH DE VARIAVEIS*****************/
 
 /*Cria um novo objeto na tabela Hash
@@ -529,4 +538,13 @@ int validarAcessoMatriz(Variavel* v, Lista* dimensoesMatriz){
             return -1;
         }
     }
+}
+
+Lista* copiarListaChar(Lista* lista){
+    Lista* l = inicializarLista();
+    Lista* k;
+    for (k = lista; k != NULL; k = k -> prox) {
+        l = criarNovoNoLista(TIPO_LITERAL, k->info, l);
+    }
+    return l;
 }

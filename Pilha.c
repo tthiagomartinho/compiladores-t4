@@ -16,7 +16,7 @@ Pilha* criarNovoItemPilha(Arvore* a){
 }
 
 Pilha* empilharElementoCriandoArvore(Pilha* p, int tipo, void* valorNo){
-    Arvore* a = inicializaArvore(tipo, valorNo);
+    Arvore* a = inicializaArvore(tipo, valorNo, NULL, NULL);
     p = empilhar(p, a);
     return p;
 }
@@ -77,7 +77,7 @@ Pilha* empilharExpressaoOperador(Pilha* p, char* operador){
         p = desempilhar(p);
         segundo = getArvoreTopoPilha(p);
         p = desempilhar(p);
-        Arvore* arvoreOperador = inicializaArvore(TIPO_LITERAL, operador);
+        Arvore* arvoreOperador = inicializaArvore(TIPO_LITERAL, operador, NULL, NULL);
         arvoreOperador = setFilhosEsquerdaCentroDireita(arvoreOperador, primeiro, segundo, NULL);
         p = empilhar(p, arvoreOperador);
     }

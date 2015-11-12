@@ -2,23 +2,31 @@
 #include "Arvore.h"
 
 struct arvore{
-	void* valorNo;
+	char* valorNo;
 	int tipo;
+    char* escopo;
+    Lista* dimensoesMatriz;
 	struct arvore* esquerda;
 	struct arvore* centro;
 	struct arvore* direita;
 	struct arvore* prox;
 };
 
-Arvore* inicializaArvore(int tipo, void* valor){
+Arvore* inicializaArvore(int tipo, void* valor, char* escopo, Lista* dimensoesMatriz){
 	Arvore* a = (Arvore*)malloc(sizeof(Arvore));
-	if(tipo == TIPO_LITERAL){
+	if(tipo != TIPO_LISTA){
 		a->valorNo = (char*)malloc((strlen(valor) + 1)*sizeof(char));
 		strcpy(a->valorNo, valor);
 	}else{
 		a->valorNo = valor;
 	}
 	
+	if(escopo != NULL){
+        a->escopo = (char*)malloc((strlen(escopo) + 1)*sizeof(char));
+        strcpy(a->escopo, escopo);
+    }
+    
+    a->dimensoesMatriz = dimensoesMatriz;
 	a->tipo = tipo;
 	a->esquerda = NULL;
 	a->centro = NULL;
@@ -44,33 +52,8 @@ int getTipoNo(Arvore* a){
 	return a->tipo;
 }
 
-void arvore_imprime_profundidade(Arvore* a, int profundidade){
-   if (!arvore_vazia(a)){
-       arvore_imprime_profundidade(a->esquerda, profundidade+1);//imprime a sad
-       int i;
-       for (i=0; i<profundidade; i++) {
-               printf(" ");
-       }
-       switch(a->tipo){
-           case TIPO_INTEIRO:
-              printf("%d", * (int*) a->valorNo); // imprime a raiz
-              break;
-           case TIPO_REAL:
-              printf("%f", * (float*) a->valorNo); // imprime a raiz
-              break;
-           case TIPO_LITERAL:
-              printf("%s", (char*) a->valorNo); // imprime a raiz
-              break;
-           case TIPO_VARIAVEL:{
-               Variavel* v = (Variavel*) a->valorNo;
-               printf("%s", getNomeVariavel(v)); // imprime a raiz
-              break;
-           }default:
-               break;
-       }
-       arvore_imprime_profundidade(a->centro, profundidade+1); //imprime a sae
-       arvore_imprime_profundidade(a->direita, profundidade+1); //imprime a sae
-   }
+void* getValorNo(Arvore* a){
+	return a->valorNo;
 }
 
 int arvore_vazia(Arvore* a){
@@ -82,101 +65,58 @@ int arvore_vazia(Arvore* a){
 }
 
 Arvore* liberarArvore(Arvore* a){
-	/*if(!arvore_vazia(a)){
+    if(!arvore_vazia(a)){
 		liberarArvore(a->esquerda);
 		liberarArvore(a->centro);
 		liberarArvore(a->direita);
-		if(a->tipo == TIPO_LITERAL){
+		if(a->tipo != TIPO_LISTA){
 			free(a->valorNo);
 			a->valorNo = NULL;
 		}
 		free(a);
-	}*/
+	}
 	return NULL;
 }
 
-int _print_t(Arvore *tree, int is_left, int offset, int depth, char s[20][255])
-{
-    char b[20];
-    int width = 5;
-
-    if (!tree) return 0;
-
-    switch(tree->tipo){
-           case TIPO_INTEIRO:
-           		sprintf(b, "%d", * (int*) tree->valorNo);
-              break;
-           case TIPO_REAL:
-              sprintf(b, "%f", * (float*) tree->valorNo);
-              break;
-           case TIPO_LITERAL:
-              sprintf(b, "%s", (char*) tree->valorNo);
-              break;
-           case TIPO_VARIAVEL:{
-               Variavel* v = (Variavel*) tree->valorNo;
-               sprintf(b, "%s", getNomeVariavel(v));
-              break;
-           }default:
-               break;
-       }
-
-    int left  = _print_t(tree->esquerda,  1, offset,                depth + 1, s);
-    int right = _print_t(tree->centro, 0, offset + left + width, depth + 1, s);
-
-#ifdef COMPACT
-    int i;
-    for (i = 0; i < width; i++)
-        s[depth][offset + left + i] = b[i];
-
-    if (depth && is_left) {
-
-        for (i = 0; i < width + right; i++)
-            s[depth - 1][offset + left + width/2 + i] = '-';
-
-        s[depth - 1][offset + left + width/2] = '.';
-
-    } else if (depth && !is_left) {
-
-        for (i = 0; i < left + width; i++)
-            s[depth - 1][offset - width/2 + i] = '-';
-
-        s[depth - 1][offset + left + width/2] = '.';
+int ehNoFolha(Arvore* a){
+    if(a->esquerda == NULL && a->centro == NULL && a->direita == NULL){
+        return 1;
+    }else{
+        return 0;
     }
-#else
-    int i;
-    for (i = 0; i < width; i++)
-        s[2 * depth][offset + left + i] = b[i];
-
-    if (depth && is_left) {
-
-        for (i = 0; i < width + right; i++)
-            s[2 * depth - 1][offset + left + width/2 + i] = '-';
-
-        s[2 * depth - 1][offset + left + width/2] = '+';
-        s[2 * depth - 1][offset + left + width + right + width/2] = '+';
-
-    } else if (depth && !is_left) {
-
-        for (i = 0; i < left + width; i++)
-            s[2 * depth - 1][offset - width/2 + i] = '-';
-
-        s[2 * depth - 1][offset + left + width/2] = '+';
-        s[2 * depth - 1][offset - width/2 - 1] = '+';
-    }
-#endif
-
-    return left + width + right;
 }
 
-int print_t(Arvore *tree)
-{
-	int i;
-    char s[20][255];
-    for (i = 0; i < 20; i++)
-        sprintf(s[i], "%80s", " ");
+Arvore* getFilhoDireita(Arvore* a){
+    return a->direita;
+}
+Arvore* getFilhoEsquerda(Arvore* a){
+    return a->esquerda;
+}
+Arvore* getFilhoCentro(Arvore* a){
+    return a->centro;
+}
 
-    _print_t(tree, 0, 0, 0, s);
+char* getEscopo(Arvore* a){
+    return a->escopo;
+}
 
-    for (i = 0; i < 20; i++)
-        printf("%s\n", s[i]);
+void padding ( char ch, int n ){
+  int i;
+  for ( i = 0; i < n; i++ )
+    putchar ( ch );
+}
+void print ( Arvore *root, int level ){
+  int i;
+  if ( root == NULL ) {
+    padding ( '\t', level );
+    puts ( "~" );
+  }
+  else {
+    print ( root->centro, level + 1 );
+    padding ( '\t', level );
+    if(root->tipo != TIPO_LISTA){
+       printf("%s", (char*) root->valorNo); 
+    }
+    print ( root->esquerda, level + 1 );
+  }
 }

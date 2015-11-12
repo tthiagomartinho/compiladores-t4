@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include "hash.h"
 #include "Pilha.h"
+#include "Executor.h"
 
 #define TIPO_OPERADOR_LOGICO 1
 #define TIPO_OPERADOR_ARITMETICO 2
@@ -28,14 +29,14 @@
 
 
     void liberarMemoriaAlocada() {
-    hashVariavel = liberarMemoriaTabelaHash(hashVariavel);
+        hashVariavel = liberarMemoriaTabelaHash(hashVariavel);
         hashFuncao = liberarMemoriaTabelaHash(hashFuncao);
         variaveis = liberarMemoriaLista(variaveis);
-    variaveisFuncao = liberarMemoriaLista(variaveisFuncao);
+        variaveisFuncao = liberarMemoriaLista(variaveisFuncao);
         dimensoesMatriz = liberarMemoriaLista(dimensoesMatriz);
         expressao = liberarMemoriaLista(expressao);
         operadores = liberarMemoriaLista(operadores);
-    parametrosFuncao = liberarMemoriaLista(parametrosFuncao);
+        parametrosFuncao = liberarMemoriaLista(parametrosFuncao);
     }
 
     void finalizarProgramaComErro(char* erro) {
@@ -338,8 +339,19 @@ PROGRAMA_PRINCIPAL
     ;
 
 LISTA_COMANDOS
-    : LISTA_COMANDOS COMANDO_ATRIBUICAO token_simboloPontoVirgula 
-    | COMANDO_ATRIBUICAO token_simboloPontoVirgula
+    : LISTA_COMANDOS COMANDO_ATRIBUICAO token_simboloPontoVirgula {
+        int abbb = avaliarExpressao(arvoreExpressao, hashVariavel);
+        printf("conta %d\n", abbb);
+    }
+    | COMANDO_ATRIBUICAO token_simboloPontoVirgula {
+        Arvore* filhoEsquerda = getFilhoEsquerda(arvoreExpressao);
+        char* nome = (char*) getValorNo(filhoEsquerda);
+        char* escopo = (char*) getEscopo(filhoEsquerda);
+        int abbb = avaliarExpressao(arvoreExpressao, hashVariavel);
+        Variavel* v = buscarVariavelTabelaHash(hashVariavel, nome, escopo);
+        
+        printf("conta final %d\n", abbb);
+    }
     | LISTA_COMANDOS COMANDO_ENQUANTO 
     | COMANDO_ENQUANTO
     | LISTA_COMANDOS COMANDO_PARA 
@@ -364,8 +376,8 @@ COMANDO_ATRIBUICAO
     :  token_identificador {
         Variavel* v = validarIdentificadorSairCasoInvalido();
         tipoExpressaoAtribuicao = getTipoVariavel(v);
-        Arvore* novoNo = inicializaArvore(TIPO_VARIAVEL, v);
-        arvoreExpressao = inicializaArvore(TIPO_LITERAL, "=");
+        Arvore* novoNo = inicializaArvore(TIPO_VARIAVEL, getNomeVariavel(v), getEscopoVariavel(v), NULL);
+        arvoreExpressao = inicializaArvore(TIPO_LITERAL, "=", NULL, NULL);
         arvoreExpressao = setFilhosEsquerdaCentroDireita(arvoreExpressao, novoNo, NULL, NULL);
     } 
     token_operadorAtribuicao COMANDO_ATRIBUICAO2
@@ -374,6 +386,10 @@ COMANDO_ATRIBUICAO
         validarAcessoMatrizSairCasoInvalido(v);
         dimensoesMatriz = liberarMemoriaLista(dimensoesMatriz);
         tipoExpressaoAtribuicao = getTipoVariavel(v);    
+        Lista* copiaDimensoes = copiarListaChar(dimensoesMatriz);
+        Arvore* novoNo = inicializaArvore(TIPO_VARIAVEL, getNomeVariavel(v), getEscopoVariavel(v), copiaDimensoes);
+        arvoreExpressao = inicializaArvore(TIPO_LITERAL, "=", NULL, NULL);
+        arvoreExpressao = setFilhosEsquerdaCentroDireita(arvoreExpressao, novoNo, NULL, NULL);
     } 
     token_operadorAtribuicao COMANDO_ATRIBUICAO2
     ;
@@ -404,8 +420,9 @@ VALOR_A_SER_ATRIBUIDO
         Arvore* ArvExp = getArvoreTopoPilha(p);
         p = desempilhar(p);
         arvoreExpressao = setFilhosEsquerdaCentroDireita(arvoreExpressao, NULL, ArvExp, NULL);
-       // print_t(ArvExp);
-        arvore_imprime_profundidade(arvoreExpressao, 0 );
+       // print_t(arvoreExpressao);
+        // arvore_imprime_profundidade(arvoreExpressao, 0 );
+        print(arvoreExpressao, 0);
     }
     | VALOR_A_SER_ATRIBUIDO COMANDO_CHAMADA_FUNCAO {
         int tipoRetornoFuncao = getTipoRetornoFuncao(hashFuncao, funcao);
@@ -630,15 +647,13 @@ NUMERO
     : INTEIRO {
     tipo = TIPO_INTEIRO;
         expressao = criarNovoNoListaFim(TIPO_INTEIRO, NULL, expressao);
-        int i = atoi(yytext);
-        Arvore *novoNo = inicializaArvore(TIPO_INTEIRO, &i);
+        Arvore *novoNo = inicializaArvore(TIPO_INTEIRO, yytext, NULL, NULL);
         p = empilhar(p, novoNo);
     }
     | REAL {
     tipo = TIPO_REAL;
         expressao = criarNovoNoListaFim(TIPO_REAL, NULL, expressao);
-        float i = atof(yytext)
-        Arvore *novoNo = inicializaArvore(TIPO_REAL, &i);
+        Arvore *novoNo = inicializaArvore(TIPO_REAL, yytext, NULL, NULL);
         p = empilhar(p, novoNo);
     }
     ;
