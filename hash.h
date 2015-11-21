@@ -1,10 +1,22 @@
-#include <stdio.h>
+#ifndef HASH_H
+#define HASH_H
+
+#ifdef  __cplusplus
+extern "C" {
+#endif
+
+    #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-typedef struct lista Lista;
 typedef struct funcao Funcao;
 typedef struct variavel Variavel;
+
+typedef struct lista {
+    void *info;
+    int tipo; //real = 0, inteiro = 1, caractere = 2, literal = 3, logico = 4, void = -1, variavel = 6, funcao = 7
+    struct lista *prox;
+} Lista;
 
 #define TIPO_VOID -1
 #define TIPO_REAL 0 
@@ -15,6 +27,7 @@ typedef struct variavel Variavel;
 #define TIPO_MATRIZ 5 
 #define TIPO_VARIAVEL 6
 #define TIPO_FUNCAO 7
+#define TIPO_ARVORE 8
 #define TIPO_LISTA 9
 
 /**************************FUNCOES BASICAS DE LISTAS***************************/
@@ -61,6 +74,9 @@ void imprimirRelatorioVariaveisNaoUtilizadas(Lista** hashVariavel);
 
 void* getValorVariavel(Variavel* v);
 
+// seta o valor da variavel de acordo com o tipo passado
+void setVariavelValor (Variavel* v, void* valor, int tipo);
+
 /**************************MANIPULACAO DE FUNCOES******************************/
 Funcao* criarFuncao(char* nome);
 
@@ -95,3 +111,12 @@ int isExpressaoValida(Lista* l, int tipoExpressaoAtribuicao);
 int validarAcessoMatriz(Variavel* v, Lista* dimensoesMatriz);
 
 Lista* copiarListaChar(Lista* lista);
+
+int tamanhoLista(Lista* lista);
+
+
+#ifdef  __cplusplus
+}
+#endif
+
+#endif  /* HASH_H */

@@ -1,17 +1,6 @@
 
 #include "Arvore.h"
 
-struct arvore{
-	char* valorNo;
-	int tipo;
-    char* escopo;
-    Lista* dimensoesMatriz;
-	struct arvore* esquerda;
-	struct arvore* centro;
-	struct arvore* direita;
-	struct arvore* prox;
-};
-
 Arvore* inicializaArvore(int tipo, void* valor, char* escopo, Lista* dimensoesMatriz){
 	Arvore* a = (Arvore*)malloc(sizeof(Arvore));
 	if(tipo != TIPO_LISTA){
@@ -96,6 +85,23 @@ Arvore* getFilhoCentro(Arvore* a){
     return a->centro;
 }
 
+Arvore* getProx(Arvore* a){
+    return a->prox;
+}
+
+Arvore* setProxComando(Arvore* a, Arvore* prox){
+    if (a == NULL) {
+        a = prox;
+    } else {
+        Arvore* aux = a;
+        while (aux -> prox != NULL) {
+            aux = aux -> prox;
+        }
+        aux -> prox = prox;
+    }
+    return a;
+}
+
 char* getEscopo(Arvore* a){
     return a->escopo;
 }
@@ -112,11 +118,39 @@ void print ( Arvore *root, int level ){
     puts ( "~" );
   }
   else {
-    print ( root->centro, level + 1 );
+
+    print ( root->esquerda, level + 1 );
     padding ( '\t', level );
     if(root->tipo != TIPO_LISTA){
-       printf("%s", (char*) root->valorNo); 
+       printf("%s %d ", (char*) root->valorNo, tamanhoLista(root->dimensoesMatriz)); 
+    }else{
+        Lista* l = (Lista*) root->valorNo;
+        Lista* aux;
+        printf("IMPRIMINDO LISTA\n");
+        for(aux = l; aux != NULL; aux = aux -> prox){
+            switch(aux -> tipo){
+                case TIPO_LITERAL:
+                    printf("%s\n", (char*) aux->info);
+                    break;
+                case TIPO_ARVORE:{
+                    Arvore* ab = (Arvore*) aux->info;
+                    imprimirArvoreComandos(ab);
+                    break;
+                }
+            }
+        }
+        printf("FIM DA IMPRESSAO DA LISTA\n");
     }
-    print ( root->esquerda, level + 1 );
+    print ( root->centro, level + 1 );
+    padding ( '\t', level );
+    print ( root->direita, level + 1 );
+    padding ( '\t', level );
+
+
+    print ( root->prox, level);
   }
+}
+
+void imprimirArvoreComandos(Arvore* programa){
+    print(programa, 0);
 }

@@ -25,7 +25,13 @@
     int tipoExpressaoAtribuicao;
     int tipoRetornoFuncao;
     Pilha* p = NULL;
-    Arvore* arvoreExpressao = NULL;
+    Arvore* arvoreComandoAtual = NULL;
+    Lista* listaComandos = NULL;
+    Arvore* programa = NULL;
+    char* nomePrograma;
+    int atribuicao = 0;
+    Pilha* pilhaNiveis = NULL;
+    Lista* comandosRepeticao = NULL;
 
 
     void liberarMemoriaAlocada() {
@@ -81,12 +87,13 @@
         }
     }
 
-    void validarOperadoresMMMMSairCasoInvalido() { //++ --
+    Variavel* validarOperadoresMMMMSairCasoInvalido() { //++ --
         Variavel* v = validarIdentificadorSairCasoInvalido();
         int tipoVariavel = getTipoVariavel(v);
         if(tipoVariavel != TIPO_REAL && tipoVariavel != TIPO_INTEIRO){
             finalizarProgramaComErro("So variaveis do tipo real ou inteiro podem ser associadas a esse comando");
         }
+        return v;
     }
 
 %}
@@ -175,7 +182,10 @@
 %%
 
 ALGORITMO
-    : token_algoritmo token_identificador token_simboloPontoVirgula PROGRAMA
+    : token_algoritmo token_identificador {
+        nomePrograma = (char*)malloc((strlen(identificador) + 1)*sizeof(char));
+        strcpy(nomePrograma, identificador);
+    } token_simboloPontoVirgula PROGRAMA
     ;
 
 PROGRAMA
@@ -334,42 +344,135 @@ POSICAO_MATRIZ
 PROGRAMA_PRINCIPAL
     : token_inicio{
         strcpy(escopo, "global");
-    } LISTA_COMANDOS token_fim
+        programa = inicializaArvore(TIPO_LITERAL, nomePrograma, NULL, NULL);
+        //Arvore* esquerda = getFilhoEsquerda(programa);
+        pilhaNiveis = empilhar(pilhaNiveis, programa);
+    } LISTA_COMANDOS {
+       // Arvore* inicializaArvore(int tipo, void* valor, char* escopo, Lista* dimensoesMatriz)
+        //Arvore* arvoreComandos = inicializaArvore(TIPO_LISTA, listaComandos, NULL, NULL);
+        
+        //programa = setFilhosEsquerdaCentroDireita(programa, arvoreComandos, NULL, NULL);
+        imprimirArvoreComandos(programa);
+    } token_fim
     | token_inicio token_fim
     ;
 
 LISTA_COMANDOS
     : LISTA_COMANDOS COMANDO_ATRIBUICAO token_simboloPontoVirgula {
-        int abbb = avaliarExpressao(arvoreExpressao, hashVariavel);
-        printf("conta %d\n", abbb);
+        Arvore* topo = getArvoreTopoPilha(pilhaNiveis);
+        pilhaNiveis = desempilhar(pilhaNiveis);
+        topo = setProxComando(topo, arvoreComandoAtual);
+        pilhaNiveis = empilhar(pilhaNiveis, topo);
+    //  listaComandos = criarNovoNoListaFim(TIPO_ARVORE, arvoreComandoAtual, listaComandos);
+        arvoreComandoAtual = NULL;
+        p = NULL;
     }
     | COMANDO_ATRIBUICAO token_simboloPontoVirgula {
-        Arvore* filhoEsquerda = getFilhoEsquerda(arvoreExpressao);
-        char* nome = (char*) getValorNo(filhoEsquerda);
-        char* escopo = (char*) getEscopo(filhoEsquerda);
-        int abbb = avaliarExpressao(arvoreExpressao, hashVariavel);
-        Variavel* v = buscarVariavelTabelaHash(hashVariavel, nome, escopo);
-        
-        printf("conta final %d\n", abbb);
+        Arvore* topo = getArvoreTopoPilha(pilhaNiveis);
+        pilhaNiveis = desempilhar(pilhaNiveis);
+        topo = setProxComando(topo, arvoreComandoAtual);
+        pilhaNiveis = empilhar(pilhaNiveis, topo);
+      //  listaComandos = criarNovoNoListaFim(TIPO_ARVORE, arvoreComandoAtual, listaComandos);
+        arvoreComandoAtual = NULL;
+        p = NULL;
     }
-    | LISTA_COMANDOS COMANDO_ENQUANTO 
-    | COMANDO_ENQUANTO
-    | LISTA_COMANDOS COMANDO_PARA 
-    | COMANDO_PARA
-    | LISTA_COMANDOS COMANDO_IMPRIMA
-    | COMANDO_IMPRIMA
-    | LISTA_COMANDOS COMANDO_CHAMADA_FUNCAO token_simboloPontoVirgula 
-    | COMANDO_CHAMADA_FUNCAO token_simboloPontoVirgula
-    | LISTA_COMANDOS COMANDO_SE 
-    | COMANDO_SE
-    | LISTA_COMANDOS COMANDO_FACA_ENQUANTO
-    | COMANDO_FACA_ENQUANTO
-    | LISTA_COMANDOS COMANDO_AVALIE
-    | COMANDO_AVALIE
-    | LISTA_COMANDOS COMANDO_RETORNO
-    | COMANDO_RETORNO
-    | LISTA_COMANDOS COMANDO_MAIS_MAIS_MENOS_MENOS
-    | COMANDO_MAIS_MAIS_MENOS_MENOS
+    | LISTA_COMANDOS COMANDO_ENQUANTO {
+        Arvore* topo = getArvoreTopoPilha(pilhaNiveis);
+        pilhaNiveis = desempilhar(pilhaNiveis);
+        topo = setProxComando(topo, arvoreComandoAtual);
+        pilhaNiveis = empilhar(pilhaNiveis, topo);
+    }
+    | COMANDO_ENQUANTO {
+        Arvore* topo = getArvoreTopoPilha(pilhaNiveis);
+        pilhaNiveis = desempilhar(pilhaNiveis);
+        topo = setProxComando(topo, arvoreComandoAtual);
+        pilhaNiveis = empilhar(pilhaNiveis, topo);
+    }
+    | LISTA_COMANDOS COMANDO_PARA  {
+        Arvore* topo = getArvoreTopoPilha(pilhaNiveis);
+        pilhaNiveis = desempilhar(pilhaNiveis);
+        topo = setProxComando(topo, arvoreComandoAtual);
+        pilhaNiveis = empilhar(pilhaNiveis, topo);
+    }
+    | COMANDO_PARA {
+        Arvore* topo = getArvoreTopoPilha(pilhaNiveis);
+        pilhaNiveis = desempilhar(pilhaNiveis);
+        topo = setProxComando(topo, arvoreComandoAtual);
+        pilhaNiveis = empilhar(pilhaNiveis, topo);
+    }
+    | LISTA_COMANDOS COMANDO_IMPRIMA {
+        Arvore* topo = getArvoreTopoPilha(pilhaNiveis);
+        pilhaNiveis = desempilhar(pilhaNiveis);
+        topo = setProxComando(topo, arvoreComandoAtual);
+        pilhaNiveis = empilhar(pilhaNiveis, topo);
+        //listaComandos = criarNovoNoListaFim(TIPO_ARVORE, arvoreComandoAtual, listaComandos);
+        arvoreComandoAtual = NULL;
+        p = NULL;
+    }
+    | COMANDO_IMPRIMA {
+        Arvore* topo = getArvoreTopoPilha(pilhaNiveis);
+        pilhaNiveis = desempilhar(pilhaNiveis);
+        topo = setProxComando(topo, arvoreComandoAtual);
+        pilhaNiveis = empilhar(pilhaNiveis, topo);
+        //listaComandos = criarNovoNoListaFim(TIPO_ARVORE, arvoreComandoAtual, listaComandos);
+        arvoreComandoAtual = NULL;
+        p = NULL;
+    }
+    | LISTA_COMANDOS COMANDO_CHAMADA_FUNCAO {
+        
+    } token_simboloPontoVirgula 
+    | COMANDO_CHAMADA_FUNCAO {
+        
+    } token_simboloPontoVirgula
+    | LISTA_COMANDOS COMANDO_SE {
+        Arvore* topo = getArvoreTopoPilha(pilhaNiveis);
+        pilhaNiveis = desempilhar(pilhaNiveis);
+        topo = setProxComando(topo, arvoreComandoAtual);
+        pilhaNiveis = empilhar(pilhaNiveis, topo);
+    }
+    | COMANDO_SE {
+        Arvore* topo = getArvoreTopoPilha(pilhaNiveis);
+        pilhaNiveis = desempilhar(pilhaNiveis);
+        topo = setProxComando(topo, arvoreComandoAtual);
+        pilhaNiveis = empilhar(pilhaNiveis, topo);
+    }
+    | LISTA_COMANDOS COMANDO_FACA_ENQUANTO {
+        
+    }
+    | COMANDO_FACA_ENQUANTO {
+        
+    }
+    | LISTA_COMANDOS COMANDO_AVALIE {
+        
+    }
+    | COMANDO_AVALIE {
+        
+    }
+    | LISTA_COMANDOS COMANDO_RETORNO {
+        
+    }
+    | COMANDO_RETORNO {
+        
+    }
+    | LISTA_COMANDOS COMANDO_MAIS_MAIS_MENOS_MENOS {
+        Arvore* topo = getArvoreTopoPilha(pilhaNiveis);
+        pilhaNiveis = desempilhar(pilhaNiveis);
+        topo = setProxComando(topo, arvoreComandoAtual);
+        pilhaNiveis = empilhar(pilhaNiveis, topo);
+        //listaComandos = criarNovoNoListaFim(TIPO_ARVORE, arvoreComandoAtual, listaComandos);
+        arvoreComandoAtual = NULL;
+        p = NULL;
+        
+    }
+    | COMANDO_MAIS_MAIS_MENOS_MENOS {
+        Arvore* topo = getArvoreTopoPilha(pilhaNiveis);
+        pilhaNiveis = desempilhar(pilhaNiveis);
+        topo = setProxComando(topo, arvoreComandoAtual);
+        pilhaNiveis = empilhar(pilhaNiveis, topo);
+        //listaComandos = criarNovoNoListaFim(TIPO_ARVORE, arvoreComandoAtual, listaComandos);
+        arvoreComandoAtual = NULL;
+        p = NULL;
+    }
     ;
 
 COMANDO_ATRIBUICAO
@@ -377,8 +480,9 @@ COMANDO_ATRIBUICAO
         Variavel* v = validarIdentificadorSairCasoInvalido();
         tipoExpressaoAtribuicao = getTipoVariavel(v);
         Arvore* novoNo = inicializaArvore(TIPO_VARIAVEL, getNomeVariavel(v), getEscopoVariavel(v), NULL);
-        arvoreExpressao = inicializaArvore(TIPO_LITERAL, "=", NULL, NULL);
-        arvoreExpressao = setFilhosEsquerdaCentroDireita(arvoreExpressao, novoNo, NULL, NULL);
+        arvoreComandoAtual = inicializaArvore(TIPO_LITERAL, "=", NULL, NULL);
+        arvoreComandoAtual = setFilhosEsquerdaCentroDireita(arvoreComandoAtual, novoNo, NULL, NULL);
+        atribuicao = 1;
     } 
     token_operadorAtribuicao COMANDO_ATRIBUICAO2
     | token_identificador POSICAO_MATRIZ{
@@ -388,15 +492,19 @@ COMANDO_ATRIBUICAO
         tipoExpressaoAtribuicao = getTipoVariavel(v);    
         Lista* copiaDimensoes = copiarListaChar(dimensoesMatriz);
         Arvore* novoNo = inicializaArvore(TIPO_VARIAVEL, getNomeVariavel(v), getEscopoVariavel(v), copiaDimensoes);
-        arvoreExpressao = inicializaArvore(TIPO_LITERAL, "=", NULL, NULL);
-        arvoreExpressao = setFilhosEsquerdaCentroDireita(arvoreExpressao, novoNo, NULL, NULL);
+        arvoreComandoAtual = inicializaArvore(TIPO_LITERAL, "=", NULL, NULL);
+        arvoreComandoAtual = setFilhosEsquerdaCentroDireita(arvoreComandoAtual, novoNo, NULL, NULL);
+        atribuicao = 1;
     } 
     token_operadorAtribuicao COMANDO_ATRIBUICAO2
     ;
 
 COMANDO_ATRIBUICAO2
     : VALOR_A_SER_ATRIBUIDO
-    | COMANDO_LEIA
+    | COMANDO_LEIA {
+        Arvore* ArvExp = inicializaArvore(TIPO_LITERAL, "leia", NULL, NULL);
+        arvoreComandoAtual = setFilhosEsquerdaCentroDireita(arvoreComandoAtual, NULL, ArvExp, NULL);
+    }
     ;
 
 VALOR_A_SER_ATRIBUIDO
@@ -419,10 +527,7 @@ VALOR_A_SER_ATRIBUIDO
 
         Arvore* ArvExp = getArvoreTopoPilha(p);
         p = desempilhar(p);
-        arvoreExpressao = setFilhosEsquerdaCentroDireita(arvoreExpressao, NULL, ArvExp, NULL);
-       // print_t(arvoreExpressao);
-        // arvore_imprime_profundidade(arvoreExpressao, 0 );
-        print(arvoreExpressao, 0);
+        arvoreComandoAtual = setFilhosEsquerdaCentroDireita(arvoreComandoAtual, NULL, ArvExp, NULL);
     }
     | VALOR_A_SER_ATRIBUIDO COMANDO_CHAMADA_FUNCAO {
         int tipoRetornoFuncao = getTipoRetornoFuncao(hashFuncao, funcao);
@@ -442,6 +547,15 @@ COMANDO_ENQUANTO
     : token_enquanto EXPRESSAO {
         tipoExpressaoAtribuicao = TIPO_LOGICO;
         validarExpressaoSairCasoInvalido();
+        Lista* aux = expressao;
+        int x = isExpressaoValida(aux, tipoExpressaoAtribuicao);
+        if(x == 0){
+            finalizarProgramaComErro("Tipo invalido associado a variavel");
+        }
+        expressao = liberarMemoriaLista(expressao);
+
+        Arvore* ArvExp = getArvoreTopoPilha(p);
+        p = desempilhar(p);
     } token_faca LISTA_COMANDOS token_fimEnquanto
     ;
 
@@ -452,18 +566,68 @@ COMANDO_PARA
         if(tipoVariavel != TIPO_INTEIRO){
             finalizarProgramaComErro("Comando PARA dever iterar sob variaveis do tipo inteiro");
         }
+        comandosRepeticao = criarNovoNoListaFim(TIPO_LITERAL, identificador, comandosRepeticao);
     } token_de EXPRESSAO {
         tipoExpressaoAtribuicao = TIPO_INTEIRO;
         validarExpressaoSairCasoInvalido();
+        expressao = liberarMemoriaLista(expressao);
+
+        Arvore* ArvExp = getArvoreTopoPilha(p);
+        p = desempilhar(p);
+        comandosRepeticao = criarNovoNoListaFim(TIPO_ARVORE, ArvExp, comandosRepeticao);
     } token_ate EXPRESSAO {
         tipoExpressaoAtribuicao = TIPO_INTEIRO;
         validarExpressaoSairCasoInvalido();
+        expressao = liberarMemoriaLista(expressao);
+
+        Arvore* ArvExp = getArvoreTopoPilha(p);
+        p = desempilhar(p);
+        comandosRepeticao = criarNovoNoListaFim(TIPO_ARVORE, ArvExp, comandosRepeticao);
     }  COMANDO_PARA2
     ;   
 
 COMANDO_PARA2
-    : token_faca LISTA_COMANDOS token_fimPara
-    | token_passo INTEIRO token_faca LISTA_COMANDOS token_fimPara
+    : token_faca {
+        Arvore* para = inicializaArvore(TIPO_LITERAL, "para", NULL, NULL);
+        Arvore* faca = inicializaArvore(TIPO_LITERAL, "faca", NULL, NULL);
+        Arvore* lista = inicializaArvore(TIPO_LISTA, comandosRepeticao, NULL, NULL);
+        faca = setFilhosEsquerdaCentroDireita(faca, lista, NULL, NULL);
+        para = setFilhosEsquerdaCentroDireita(para, NULL, faca, NULL);
+        pilhaNiveis = empilhar(pilhaNiveis, para);
+        pilhaNiveis = empilhar(pilhaNiveis, faca);
+        //pilhaNiveis = empilhar(pilhaNiveis, NULL);
+        comandosRepeticao = NULL;
+    } LISTA_COMANDOS {
+        Arvore* faca = getArvoreTopoPilha(pilhaNiveis);
+        pilhaNiveis = desempilhar(pilhaNiveis);
+        Arvore* para = getArvoreTopoPilha(pilhaNiveis);
+        pilhaNiveis = desempilhar(pilhaNiveis);
+        setFilhosEsquerdaCentroDireita(para, NULL, faca, NULL);
+        arvoreComandoAtual = para;
+    } token_fimPara
+    | token_passo INTEIRO {
+        Arvore* ArvExp = getArvoreTopoPilha(p);
+        p = desempilhar(p);
+        p = NULL;
+        comandosRepeticao = criarNovoNoListaFim(TIPO_ARVORE, ArvExp, comandosRepeticao);
+        Arvore* para = inicializaArvore(TIPO_LITERAL, "para", NULL, NULL);
+        Arvore* faca = inicializaArvore(TIPO_LITERAL, "faca", NULL, NULL);
+        Arvore* lista = inicializaArvore(TIPO_LISTA, comandosRepeticao, NULL, NULL);
+        faca = setFilhosEsquerdaCentroDireita(faca, lista, NULL, NULL);
+        para = setFilhosEsquerdaCentroDireita(para, NULL, faca, NULL);
+        pilhaNiveis = empilhar(pilhaNiveis, para);
+        pilhaNiveis = empilhar(pilhaNiveis, faca);
+       // pilhaNiveis = empilhar(pilhaNiveis, NULL);
+        comandosRepeticao = NULL;
+
+    } token_faca LISTA_COMANDOS {
+        Arvore* faca = getArvoreTopoPilha(pilhaNiveis);
+        pilhaNiveis = desempilhar(pilhaNiveis);
+        Arvore* para = getArvoreTopoPilha(pilhaNiveis);
+        pilhaNiveis = desempilhar(pilhaNiveis);
+        setFilhosEsquerdaCentroDireita(para, NULL, faca, NULL);
+        arvoreComandoAtual = para;
+    } token_fimPara
     ;
 
 COMANDO_SE
@@ -471,12 +635,52 @@ COMANDO_SE
         tipoExpressaoAtribuicao = TIPO_LOGICO;
     } EXPRESSAO {
         validarExpressaoSairCasoInvalido();
-    } token_entao LISTA_COMANDOS COMANDO_SE2
+        expressao = liberarMemoriaLista(expressao);
+
+        Arvore* ArvExp = getArvoreTopoPilha(p);
+        p = desempilhar(p);
+        p = NULL;
+        Arvore* se = inicializaArvore(TIPO_LITERAL, "se", NULL, NULL);
+        Arvore* entao = inicializaArvore(TIPO_LITERAL, "entao", NULL, NULL);
+        Arvore* senao = inicializaArvore(TIPO_LITERAL, "senao", NULL, NULL);
+        se = setFilhosEsquerdaCentroDireita(se, ArvExp, entao, senao);
+        pilhaNiveis = empilhar(pilhaNiveis, se);
+    } token_entao {
+        Arvore* se = getArvoreTopoPilha(pilhaNiveis);
+        Arvore* entao = getFilhoCentro(se);
+        pilhaNiveis = empilhar(pilhaNiveis, entao); 
+        //pilhaNiveis = empilhar(pilhaNiveis, NULL); 
+    } LISTA_COMANDOS {
+        Arvore* entao = getArvoreTopoPilha(pilhaNiveis);
+        pilhaNiveis = desempilhar(pilhaNiveis);
+        Arvore* se = getArvoreTopoPilha(pilhaNiveis);
+        pilhaNiveis = desempilhar(pilhaNiveis);
+        se = setFilhosEsquerdaCentroDireita(se, NULL, entao, NULL);
+        pilhaNiveis = empilhar(pilhaNiveis, se); 
+
+    } COMANDO_SE2
     ;
 
 COMANDO_SE2
-    : token_senao LISTA_COMANDOS token_fimSe
-    | token_fimSe
+    : token_senao {
+        Arvore* se = getArvoreTopoPilha(pilhaNiveis);
+        Arvore* senao = getFilhoDireita(se);
+        pilhaNiveis = empilhar(pilhaNiveis, senao); 
+        //pilhaNiveis = empilhar(pilhaNiveis, NULL); 
+    }
+     LISTA_COMANDOS {
+        Arvore* senao = getArvoreTopoPilha(pilhaNiveis);
+        pilhaNiveis = desempilhar(pilhaNiveis);
+        Arvore* se = getArvoreTopoPilha(pilhaNiveis);
+        pilhaNiveis = desempilhar(pilhaNiveis);
+        setFilhosEsquerdaCentroDireita(se, NULL, NULL, senao);
+        arvoreComandoAtual = se;
+     } token_fimSe
+    | token_fimSe {
+        Arvore* se = getArvoreTopoPilha(pilhaNiveis);
+        pilhaNiveis = desempilhar(pilhaNiveis);
+        arvoreComandoAtual = se;
+    }
     ;
 
 COMANDO_FACA_ENQUANTO
@@ -507,7 +711,32 @@ COMANDO_LEIA
     ;
 
 COMANDO_IMPRIMA
-    : token_imprima token_simboloAbreParentese POSSIVEIS_PARAMETROS token_simboloFechaParentese token_simboloPontoVirgula
+    : token_imprima token_simboloAbreParentese token_identificador {
+        Variavel* v = validarIdentificadorSairCasoInvalido();
+        Arvore* novoNo = inicializaArvore(TIPO_VARIAVEL, getNomeVariavel(v), getEscopoVariavel(v), NULL);
+        arvoreComandoAtual = inicializaArvore(TIPO_LITERAL, "imprima", NULL, NULL);
+        arvoreComandoAtual = setFilhosEsquerdaCentroDireita(arvoreComandoAtual, novoNo, NULL, NULL);
+    } token_simboloFechaParentese token_simboloPontoVirgula
+    | token_imprima token_simboloAbreParentese NUMERO {
+        Arvore* a = getArvoreTopoPilha(p);
+        arvoreComandoAtual = inicializaArvore(TIPO_LITERAL, "imprima", NULL, NULL);
+        arvoreComandoAtual = setFilhosEsquerdaCentroDireita(arvoreComandoAtual, a, NULL, NULL);
+    } token_simboloFechaParentese token_simboloPontoVirgula
+    | token_imprima token_simboloAbreParentese ACESSO_MATRIZ {
+        Arvore* a = getArvoreTopoPilha(p);
+        arvoreComandoAtual = inicializaArvore(TIPO_LITERAL, "imprima", NULL, NULL);
+        arvoreComandoAtual = setFilhosEsquerdaCentroDireita(arvoreComandoAtual, a, NULL, NULL);
+    } token_simboloFechaParentese token_simboloPontoVirgula
+    | token_imprima token_simboloAbreParentese LOGICO {
+        Arvore* a = getArvoreTopoPilha(p);
+        arvoreComandoAtual = inicializaArvore(TIPO_LITERAL, "imprima", NULL, NULL);
+        arvoreComandoAtual = setFilhosEsquerdaCentroDireita(arvoreComandoAtual, a, NULL, NULL);
+    } token_simboloFechaParentese token_simboloPontoVirgula
+    | token_imprima token_simboloAbreParentese CARACTERE_LITERAL {
+        Arvore* a = getArvoreTopoPilha(p);
+        arvoreComandoAtual = inicializaArvore(TIPO_LITERAL, "imprima", NULL, NULL);
+        arvoreComandoAtual = setFilhosEsquerdaCentroDireita(arvoreComandoAtual, a, NULL, NULL);
+    } token_simboloFechaParentese token_simboloPontoVirgula
     ;
 
 PARAMETROS_FUNCAO
@@ -554,16 +783,28 @@ COMANDO_CHAMADA_FUNCAO2
 
 COMANDO_MAIS_MAIS_MENOS_MENOS
     : token_identificador {
-        validarOperadoresMMMMSairCasoInvalido();
+        Variavel* v = validarOperadoresMMMMSairCasoInvalido();
+        Arvore* novoNo = inicializaArvore(TIPO_VARIAVEL, getNomeVariavel(v), getEscopoVariavel(v), NULL);
+        arvoreComandoAtual = inicializaArvore(TIPO_LITERAL, "++", NULL, NULL);
+        arvoreComandoAtual = setFilhosEsquerdaCentroDireita(arvoreComandoAtual, NULL, novoNo, NULL);
     } token_operadorSomaSoma token_simboloPontoVirgula
     | token_operadorSomaSoma token_identificador {
-        validarOperadoresMMMMSairCasoInvalido();
+        Variavel* v = validarOperadoresMMMMSairCasoInvalido();
+        Arvore* novoNo = inicializaArvore(TIPO_VARIAVEL, getNomeVariavel(v), getEscopoVariavel(v), NULL);
+        arvoreComandoAtual = inicializaArvore(TIPO_LITERAL, "++", NULL, NULL);
+        arvoreComandoAtual = setFilhosEsquerdaCentroDireita(arvoreComandoAtual, novoNo, NULL, NULL);
     } token_simboloPontoVirgula
     | token_identificador {
-        validarOperadoresMMMMSairCasoInvalido();
+        Variavel* v = validarOperadoresMMMMSairCasoInvalido();
+        Arvore* novoNo = inicializaArvore(TIPO_VARIAVEL, getNomeVariavel(v), getEscopoVariavel(v), NULL);
+        arvoreComandoAtual = inicializaArvore(TIPO_LITERAL, "--", NULL, NULL);
+        arvoreComandoAtual = setFilhosEsquerdaCentroDireita(arvoreComandoAtual, NULL, novoNo, NULL);
     } token_operadorSubtraiSubtrai token_simboloPontoVirgula
     | token_operadorSubtraiSubtrai token_identificador {
-        validarOperadoresMMMMSairCasoInvalido();
+        Variavel* v = validarOperadoresMMMMSairCasoInvalido();
+        Arvore* novoNo = inicializaArvore(TIPO_VARIAVEL, getNomeVariavel(v), getEscopoVariavel(v), NULL);
+        arvoreComandoAtual = inicializaArvore(TIPO_LITERAL, "--", NULL, NULL);
+        arvoreComandoAtual = setFilhosEsquerdaCentroDireita(arvoreComandoAtual, novoNo, NULL, NULL);
     } token_simboloPontoVirgula
     ;  
 
@@ -571,22 +812,34 @@ EXPRESSAO
     : EXPRESSAO_SIMPLES
     | EXPRESSAO_SIMPLES token_operadorIgualIgual {
         operadores = criarNovoNoListaFim(TIPO_OPERADOR_LOGICO, NULL, operadores);
-    } EXPRESSAO_SIMPLES 
+    } EXPRESSAO_SIMPLES {
+        p = empilharExpressaoOperador(p, "==");
+    }
     | EXPRESSAO_SIMPLES token_operadorMenor {
         operadores = criarNovoNoListaFim(TIPO_OPERADOR_LOGICO, NULL, operadores);
-    } EXPRESSAO_SIMPLES 
+    } EXPRESSAO_SIMPLES {
+        p = empilharExpressaoOperador(p, "<");
+    }
     | EXPRESSAO_SIMPLES token_operadorMenorIgual {
         operadores = criarNovoNoListaFim(TIPO_OPERADOR_LOGICO, NULL, operadores);
-    } EXPRESSAO_SIMPLES 
+    } EXPRESSAO_SIMPLES {
+        p = empilharExpressaoOperador(p, "<=");
+    }
     | EXPRESSAO_SIMPLES token_operadorMaiorIgual {
         operadores = criarNovoNoListaFim(TIPO_OPERADOR_LOGICO, NULL, operadores);
-    } EXPRESSAO_SIMPLES 
+    } EXPRESSAO_SIMPLES {
+        p = empilharExpressaoOperador(p, ">=");
+    }
     | EXPRESSAO_SIMPLES token_operadorMaior {
         operadores = criarNovoNoListaFim(TIPO_OPERADOR_LOGICO, NULL, operadores);
-    } EXPRESSAO_SIMPLES 
+    } EXPRESSAO_SIMPLES {
+        p = empilharExpressaoOperador(p, ">");
+    }
     | EXPRESSAO_SIMPLES token_operadorDiferente {
         operadores = criarNovoNoListaFim(TIPO_OPERADOR_LOGICO, NULL, operadores);
-    } EXPRESSAO_SIMPLES 
+    } EXPRESSAO_SIMPLES {
+        p = empilharExpressaoOperador(p, "<>");
+    }
     ;
 
 EXPRESSAO_SIMPLES
@@ -598,10 +851,14 @@ EXPRESSAO_SIMPLES
     }
     | EXPRESSAO_SIMPLES token_operadorMenos {
         operadores = criarNovoNoListaFim(TIPO_OPERADOR_ARITMETICO, NULL, operadores);
-    } TERMO
+    } TERMO {
+        p = empilharExpressaoOperador(p, "-");
+    }
     | EXPRESSAO_SIMPLES token_operadorOu {
         operadores = criarNovoNoListaFim(TIPO_OPERADOR_LOGICO, NULL, operadores);
-    } TERMO
+    } TERMO {
+        p = empilharExpressaoOperador(p, "ou");
+    }
     ;
 
 TERMO
@@ -613,25 +870,35 @@ TERMO
     }
     | TERMO token_operadorDividir {
         operadores = criarNovoNoListaFim(TIPO_OPERADOR_ARITMETICO, NULL, operadores);
-    } FATOR
+    } FATOR {
+         p = empilharExpressaoOperador(p, "/");
+    }
     | TERMO token_operadorPorcento {
         operadores = criarNovoNoListaFim(TIPO_OPERADOR_ARITMETICO, NULL, operadores);
-    } FATOR
+    } FATOR{
+        p = empilharExpressaoOperador(p, "%");
+    }
     | TERMO token_operadorPotencia {
         operadores = criarNovoNoListaFim(TIPO_OPERADOR_ARITMETICO, NULL, operadores);
-    } FATOR
+    } FATOR {
+        p = empilharExpressaoOperador(p, "^");
+    }
     | TERMO token_operadorE {
         operadores = criarNovoNoListaFim(TIPO_OPERADOR_LOGICO, NULL, operadores);
-    } FATOR
+    } FATOR {
+        p = empilharExpressaoOperador(p, "e");
+    }
     ;
 
 
 FATOR
     : token_identificador {
        //variavel declarada     
-       Variavel* v = validarIdentificadorSairCasoInvalido();
+        Variavel* v = validarIdentificadorSairCasoInvalido();
         tipo = getTipoVariavel(v);
         expressao = criarNovoNoListaFim(tipo, yytext, expressao);
+        Arvore *novoNo = inicializaArvore(TIPO_VARIAVEL, getNomeVariavel(v), getEscopoVariavel(v), NULL);
+        p = empilhar(p, novoNo);
     }
     | NUMERO
     | ACESSO_MATRIZ
@@ -669,17 +936,27 @@ REAL
     ;
 
 LOGICO
-    : token_verdadeiro
-    | token_falso
-    | token_operadorNao FATOR
+    : token_verdadeiro {
+        Arvore* novoNo = inicializaArvore(TIPO_LOGICO, "verdadeiro", NULL, NULL);
+        p = empilhar(p, novoNo);
+    }
+    | token_falso {
+        Arvore* novoNo = inicializaArvore(TIPO_LOGICO, "falso", NULL, NULL);
+        p = empilhar(p, novoNo);
+    }
+    | token_operadorNao {
+         p = empilharExpressaoOperador(p, "nao");
+    } FATOR
     ;
 
 CARACTERE_LITERAL
     : token_literal {
-    tipo = TIPO_LITERAL;
+        Arvore* novoNo = inicializaArvore(TIPO_LITERAL, yytext, NULL, NULL);
+        p = empilhar(p, novoNo);
     }
     | token_caractere {
-    tipo = TIPO_CARACTERE;
+       Arvore* novoNo = inicializaArvore(TIPO_LITERAL, yytext, NULL, NULL);
+        p = empilhar(p, novoNo); 
     }
     ;
 
@@ -690,6 +967,11 @@ ACESSO_MATRIZ
         validarAcessoMatrizSairCasoInvalido(v);
         tipo = getTipoVariavel(v);
         expressao = criarNovoNoListaFim(tipo, yytext, expressao);
+        
+        Lista* copiaDimensoes = copiarListaChar(dimensoesMatriz);
+        Arvore* novoNo = inicializaArvore(TIPO_VARIAVEL, getNomeVariavel(v), getEscopoVariavel(v), copiaDimensoes);
+        p = empilhar(p, novoNo);
+     
         dimensoesMatriz = liberarMemoriaLista(dimensoesMatriz);
     }
     ;

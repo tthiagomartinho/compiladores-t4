@@ -19,11 +19,6 @@ struct funcao {
     int aridade;
 };
 
-struct lista {
-    void *info;
-    int tipo; //real = 0, inteiro = 1, caractere = 2, literal = 3, logico = 4, void = -1, variavel = 6, funcao = 7
-    struct lista *prox;
-};
 
 /**************************FUNCOES BASICAS DE LISTAS***************************/
 Lista* inicializarLista() {
@@ -227,6 +222,41 @@ char* getNomeVariavel(Variavel* v){
 
 void* getValorVariavel(Variavel* v){
     return v->valor;
+}
+
+// setar valor da variável de acordo com o seu tipo
+void setVariavelValor (Variavel* v, void* valor, int tipo) {
+	int valorInteiro = 0;
+	float valorReal = 0.0;
+	int valorLogico = 0;
+
+	switch (tipo) {
+		case TIPO_INTEIRO:
+		//	valorInteiro = *((int *) valor);
+		//	v->valor = &valorInteiro;
+			return;
+		case TIPO_REAL:
+		//	valorReal = *((float *) valor);
+		//	v->valor = &valorReal;
+			return;
+		case TIPO_LOGICO:
+			valorLogico = *((int* ) valor);
+			/*
+			 * Se valorLogico > 0 setar o valor da variável para 1
+			 * Se valorLogico = 0 setar o valor da variável para 0
+			 * Se valorLogico < 0 retornar erro
+			 */
+			if (valorLogico > 0) {
+			//	v->valor = 1;
+			} else if (valorLogico == 0) {
+			//	v->valor = 0;
+			} else {
+				printf ("Valor Lógico menor que zero!\n");
+				exit(1);
+			}
+
+			return;
+	}
 }
 
 char* getEscopoVariavel(Variavel* v){
@@ -547,4 +577,21 @@ Lista* copiarListaChar(Lista* lista){
         l = criarNovoNoLista(TIPO_LITERAL, k->info, l);
     }
     return l;
+}
+
+void imprimirListaComandos(Lista* lista){
+    Lista* l;
+    for(l = lista; l != NULL; l = l->prox){
+        
+    }
+}
+
+
+int tamanhoLista(Lista* lista){
+    Lista* l;
+    int i = 0;
+    for(l = lista; l != NULL; l = l->prox){
+        i++;
+    }
+    return i;
 }

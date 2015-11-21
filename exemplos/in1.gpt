@@ -8,8 +8,51 @@ variaveis
   valor1, valor2 : real;
   res : inteiro;
   operacao : inteiro;
+  l : logico;
 fim-variaveis
 
 inicio
-  operacao = 10 + 20*50;
+  operacao = 15 + 10*10;
+  operacao = 15 + 10*5;
+  operacao++;
+  ++operacao;
+  imprima(operacao);
+  operacao = leia();
+ 
+  se (operacao == 2) entao
+  	se (operacao == 2) entao
+  		se (operacao == 2) entao
+  			operacao = 2;
+  		senao 
+  			operacao = 3;
+  		fim-se
+  	senao 
+  		operacao = 3;
+  	fim-se
+  	operacao = 3;
+  	l = 5 == 5;
+  	l = 4 > 3;
+  	valor1 = 1.1 + 4.5;
+  senao 
+  	operacao = 3;
+  fim-se
+  l = 3 == 7;
+  operacao = 200 + 300;
+ operacao = 15 + 10*10;
+  operacao = 15 + 10*5;
+  operacao++;
+  ++operacao;
+  imprima(operacao);
+  operacao = leia(); 
+
+  para operacao de 0 ate 10 faca 
+    operacao = 10;
+  fim-para
+
+  se (operacao == 2) entao
+  			operacao = 2;
+  		senao 
+  			operacao = 3;
+  		fim-se
+
 fim
