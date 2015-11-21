@@ -29,7 +29,6 @@
     Lista* listaComandos = NULL;
     Arvore* programa = NULL;
     char* nomePrograma;
-    int atribuicao = 0;
     Pilha* pilhaNiveis = NULL;
     Lista* comandosRepeticao = NULL;
 
@@ -94,6 +93,16 @@
             finalizarProgramaComErro("So variaveis do tipo real ou inteiro podem ser associadas a esse comando");
         }
         return v;
+    }
+
+    void incluirComando(){
+        Arvore* topo = getArvoreTopoPilha(pilhaNiveis);
+        pilhaNiveis = desempilhar(pilhaNiveis);
+        topo = setProxComando(topo, arvoreComandoAtual);
+        pilhaNiveis = empilhar(pilhaNiveis, topo);
+      //  listaComandos = criarNovoNoListaFim(TIPO_ARVORE, arvoreComandoAtual, listaComandos);
+        arvoreComandoAtual = NULL;
+        p = NULL;
     }
 
 %}
@@ -359,119 +368,65 @@ PROGRAMA_PRINCIPAL
 
 LISTA_COMANDOS
     : LISTA_COMANDOS COMANDO_ATRIBUICAO token_simboloPontoVirgula {
-        Arvore* topo = getArvoreTopoPilha(pilhaNiveis);
-        pilhaNiveis = desempilhar(pilhaNiveis);
-        topo = setProxComando(topo, arvoreComandoAtual);
-        pilhaNiveis = empilhar(pilhaNiveis, topo);
-    //  listaComandos = criarNovoNoListaFim(TIPO_ARVORE, arvoreComandoAtual, listaComandos);
-        arvoreComandoAtual = NULL;
-        p = NULL;
+        incluirComando();
     }
     | COMANDO_ATRIBUICAO token_simboloPontoVirgula {
-        Arvore* topo = getArvoreTopoPilha(pilhaNiveis);
-        pilhaNiveis = desempilhar(pilhaNiveis);
-        topo = setProxComando(topo, arvoreComandoAtual);
-        pilhaNiveis = empilhar(pilhaNiveis, topo);
-      //  listaComandos = criarNovoNoListaFim(TIPO_ARVORE, arvoreComandoAtual, listaComandos);
-        arvoreComandoAtual = NULL;
-        p = NULL;
+        incluirComando();
     }
     | LISTA_COMANDOS COMANDO_ENQUANTO {
-        Arvore* topo = getArvoreTopoPilha(pilhaNiveis);
-        pilhaNiveis = desempilhar(pilhaNiveis);
-        topo = setProxComando(topo, arvoreComandoAtual);
-        pilhaNiveis = empilhar(pilhaNiveis, topo);
+        incluirComando();
     }
     | COMANDO_ENQUANTO {
-        Arvore* topo = getArvoreTopoPilha(pilhaNiveis);
-        pilhaNiveis = desempilhar(pilhaNiveis);
-        topo = setProxComando(topo, arvoreComandoAtual);
-        pilhaNiveis = empilhar(pilhaNiveis, topo);
+        incluirComando();
     }
     | LISTA_COMANDOS COMANDO_PARA  {
-        Arvore* topo = getArvoreTopoPilha(pilhaNiveis);
-        pilhaNiveis = desempilhar(pilhaNiveis);
-        topo = setProxComando(topo, arvoreComandoAtual);
-        pilhaNiveis = empilhar(pilhaNiveis, topo);
+        incluirComando();
     }
     | COMANDO_PARA {
-        Arvore* topo = getArvoreTopoPilha(pilhaNiveis);
-        pilhaNiveis = desempilhar(pilhaNiveis);
-        topo = setProxComando(topo, arvoreComandoAtual);
-        pilhaNiveis = empilhar(pilhaNiveis, topo);
+        incluirComando();
     }
     | LISTA_COMANDOS COMANDO_IMPRIMA {
-        Arvore* topo = getArvoreTopoPilha(pilhaNiveis);
-        pilhaNiveis = desempilhar(pilhaNiveis);
-        topo = setProxComando(topo, arvoreComandoAtual);
-        pilhaNiveis = empilhar(pilhaNiveis, topo);
-        //listaComandos = criarNovoNoListaFim(TIPO_ARVORE, arvoreComandoAtual, listaComandos);
-        arvoreComandoAtual = NULL;
-        p = NULL;
+        incluirComando();
     }
     | COMANDO_IMPRIMA {
-        Arvore* topo = getArvoreTopoPilha(pilhaNiveis);
-        pilhaNiveis = desempilhar(pilhaNiveis);
-        topo = setProxComando(topo, arvoreComandoAtual);
-        pilhaNiveis = empilhar(pilhaNiveis, topo);
-        //listaComandos = criarNovoNoListaFim(TIPO_ARVORE, arvoreComandoAtual, listaComandos);
-        arvoreComandoAtual = NULL;
-        p = NULL;
+        incluirComando();
     }
     | LISTA_COMANDOS COMANDO_CHAMADA_FUNCAO {
-        
+        incluirComando();
     } token_simboloPontoVirgula 
     | COMANDO_CHAMADA_FUNCAO {
-        
+        incluirComando();
     } token_simboloPontoVirgula
     | LISTA_COMANDOS COMANDO_SE {
-        Arvore* topo = getArvoreTopoPilha(pilhaNiveis);
-        pilhaNiveis = desempilhar(pilhaNiveis);
-        topo = setProxComando(topo, arvoreComandoAtual);
-        pilhaNiveis = empilhar(pilhaNiveis, topo);
+        incluirComando();
     }
     | COMANDO_SE {
-        Arvore* topo = getArvoreTopoPilha(pilhaNiveis);
-        pilhaNiveis = desempilhar(pilhaNiveis);
-        topo = setProxComando(topo, arvoreComandoAtual);
-        pilhaNiveis = empilhar(pilhaNiveis, topo);
+        incluirComando();
     }
     | LISTA_COMANDOS COMANDO_FACA_ENQUANTO {
-        
+        incluirComando();
     }
     | COMANDO_FACA_ENQUANTO {
-        
+        incluirComando();
     }
     | LISTA_COMANDOS COMANDO_AVALIE {
-        
+        incluirComando();
     }
     | COMANDO_AVALIE {
-        
+        incluirComando();
     }
     | LISTA_COMANDOS COMANDO_RETORNO {
-        
+        incluirComando();
     }
     | COMANDO_RETORNO {
         
     }
     | LISTA_COMANDOS COMANDO_MAIS_MAIS_MENOS_MENOS {
-        Arvore* topo = getArvoreTopoPilha(pilhaNiveis);
-        pilhaNiveis = desempilhar(pilhaNiveis);
-        topo = setProxComando(topo, arvoreComandoAtual);
-        pilhaNiveis = empilhar(pilhaNiveis, topo);
-        //listaComandos = criarNovoNoListaFim(TIPO_ARVORE, arvoreComandoAtual, listaComandos);
-        arvoreComandoAtual = NULL;
-        p = NULL;
+        incluirComando();
         
     }
     | COMANDO_MAIS_MAIS_MENOS_MENOS {
-        Arvore* topo = getArvoreTopoPilha(pilhaNiveis);
-        pilhaNiveis = desempilhar(pilhaNiveis);
-        topo = setProxComando(topo, arvoreComandoAtual);
-        pilhaNiveis = empilhar(pilhaNiveis, topo);
-        //listaComandos = criarNovoNoListaFim(TIPO_ARVORE, arvoreComandoAtual, listaComandos);
-        arvoreComandoAtual = NULL;
-        p = NULL;
+        incluirComando();
     }
     ;
 
@@ -482,7 +437,6 @@ COMANDO_ATRIBUICAO
         Arvore* novoNo = inicializaArvore(TIPO_VARIAVEL, getNomeVariavel(v), getEscopoVariavel(v), NULL);
         arvoreComandoAtual = inicializaArvore(TIPO_LITERAL, "=", NULL, NULL);
         arvoreComandoAtual = setFilhosEsquerdaCentroDireita(arvoreComandoAtual, novoNo, NULL, NULL);
-        atribuicao = 1;
     } 
     token_operadorAtribuicao COMANDO_ATRIBUICAO2
     | token_identificador POSICAO_MATRIZ{
@@ -494,7 +448,6 @@ COMANDO_ATRIBUICAO
         Arvore* novoNo = inicializaArvore(TIPO_VARIAVEL, getNomeVariavel(v), getEscopoVariavel(v), copiaDimensoes);
         arvoreComandoAtual = inicializaArvore(TIPO_LITERAL, "=", NULL, NULL);
         arvoreComandoAtual = setFilhosEsquerdaCentroDireita(arvoreComandoAtual, novoNo, NULL, NULL);
-        atribuicao = 1;
     } 
     token_operadorAtribuicao COMANDO_ATRIBUICAO2
     ;
@@ -509,21 +462,14 @@ COMANDO_ATRIBUICAO2
 
 VALOR_A_SER_ATRIBUIDO
     : VALOR_A_SER_ATRIBUIDO EXPRESSAO {
-        Lista* aux = expressao;
-        int x = isExpressaoValida(aux, tipoExpressaoAtribuicao);
-        if(x == 0){
-            finalizarProgramaComErro("Tipo invalido associado a variavel");
-        }
-        expressao = liberarMemoriaLista(expressao);
+        validarExpressaoSairCasoInvalido();
+
+        Arvore* ArvExp = getArvoreTopoPilha(p);
+        p = desempilhar(p);
+        arvoreComandoAtual = setFilhosEsquerdaCentroDireita(arvoreComandoAtual, NULL, ArvExp, NULL);
     }
     | EXPRESSAO {
         validarExpressaoSairCasoInvalido();
-        Lista* aux = expressao;
-        int x = isExpressaoValida(aux, tipoExpressaoAtribuicao);
-        if(x == 0){
-            finalizarProgramaComErro("Tipo invalido associado a variavel");
-        }
-        expressao = liberarMemoriaLista(expressao);
 
         Arvore* ArvExp = getArvoreTopoPilha(p);
         p = desempilhar(p);
@@ -547,16 +493,26 @@ COMANDO_ENQUANTO
     : token_enquanto EXPRESSAO {
         tipoExpressaoAtribuicao = TIPO_LOGICO;
         validarExpressaoSairCasoInvalido();
-        Lista* aux = expressao;
-        int x = isExpressaoValida(aux, tipoExpressaoAtribuicao);
-        if(x == 0){
-            finalizarProgramaComErro("Tipo invalido associado a variavel");
-        }
-        expressao = liberarMemoriaLista(expressao);
 
         Arvore* ArvExp = getArvoreTopoPilha(p);
         p = desempilhar(p);
-    } token_faca LISTA_COMANDOS token_fimEnquanto
+        p = NULL;
+        Arvore* enquanto = inicializaArvore(TIPO_LITERAL, "enquanto", NULL, NULL);
+        Arvore* faca = inicializaArvore(TIPO_LITERAL, "faca", NULL, NULL);
+        enquanto = setFilhosEsquerdaCentroDireita(enquanto, ArvExp, faca, NULL);
+        pilhaNiveis = empilhar(pilhaNiveis, enquanto);
+        pilhaNiveis = empilhar(pilhaNiveis, faca);
+        //pilhaNiveis = empilhar(pilhaNiveis, NULL);
+
+
+    } token_faca LISTA_COMANDOS {
+        Arvore* faca = getArvoreTopoPilha(pilhaNiveis);
+        pilhaNiveis = desempilhar(pilhaNiveis);
+        Arvore* enquanto = getArvoreTopoPilha(pilhaNiveis);
+        pilhaNiveis = desempilhar(pilhaNiveis);
+        enquanto = setFilhosEsquerdaCentroDireita(enquanto, NULL, faca, NULL);
+        arvoreComandoAtual = enquanto;
+    } token_fimEnquanto
     ;
 
 COMANDO_PARA
@@ -570,7 +526,6 @@ COMANDO_PARA
     } token_de EXPRESSAO {
         tipoExpressaoAtribuicao = TIPO_INTEIRO;
         validarExpressaoSairCasoInvalido();
-        expressao = liberarMemoriaLista(expressao);
 
         Arvore* ArvExp = getArvoreTopoPilha(p);
         p = desempilhar(p);
@@ -578,7 +533,6 @@ COMANDO_PARA
     } token_ate EXPRESSAO {
         tipoExpressaoAtribuicao = TIPO_INTEIRO;
         validarExpressaoSairCasoInvalido();
-        expressao = liberarMemoriaLista(expressao);
 
         Arvore* ArvExp = getArvoreTopoPilha(p);
         p = desempilhar(p);
@@ -635,7 +589,6 @@ COMANDO_SE
         tipoExpressaoAtribuicao = TIPO_LOGICO;
     } EXPRESSAO {
         validarExpressaoSairCasoInvalido();
-        expressao = liberarMemoriaLista(expressao);
 
         Arvore* ArvExp = getArvoreTopoPilha(p);
         p = desempilhar(p);
@@ -684,9 +637,28 @@ COMANDO_SE2
     ;
 
 COMANDO_FACA_ENQUANTO
-    : token_faca token_simboloDoisPontos LISTA_COMANDOS token_enquanto EXPRESSAO {
+    : token_faca {
         tipoExpressaoAtribuicao = TIPO_LOGICO;
         validarExpressaoSairCasoInvalido();
+        Arvore* facaEnquanto = inicializaArvore(TIPO_LITERAL, "faca-enquanto", NULL, NULL);
+        Arvore* faca = inicializaArvore(TIPO_LITERAL, "faca", NULL, NULL);
+        facaEnquanto = setFilhosEsquerdaCentroDireita(facaEnquanto, faca, NULL, NULL);
+        pilhaNiveis = empilhar(pilhaNiveis, facaEnquanto);
+        pilhaNiveis = empilhar(pilhaNiveis, faca);
+        //pilhaNiveis = empilhar(pilhaNiveis, NULL);
+    } token_simboloDoisPontos LISTA_COMANDOS token_enquanto EXPRESSAO {
+        tipoExpressaoAtribuicao = TIPO_LOGICO;
+        validarExpressaoSairCasoInvalido();
+        Arvore* ArvExp = getArvoreTopoPilha(p);
+        p = desempilhar(p);
+
+        Arvore* para = getArvoreTopoPilha(pilhaNiveis);
+        pilhaNiveis = desempilhar(pilhaNiveis);
+        Arvore* facaEnquanto = getArvoreTopoPilha(pilhaNiveis);
+        pilhaNiveis = desempilhar(pilhaNiveis);
+        facaEnquanto = setFilhosEsquerdaCentroDireita(facaEnquanto, ArvExp, para, NULL);
+        arvoreComandoAtual = facaEnquanto;
+        //pilhaNiveis = empilhar(pilhaNiveis, NULL);
     } token_fimEnquanto
     ;
 
@@ -698,12 +670,52 @@ COMANDO_AVALIE
         if(tipoVariavel != TIPO_INTEIRO){
             finalizarProgramaComErro("Nao eh possivel avaliar variaveis cujo tipo nao eh inteiro");
         }
-    } token_simboloFechaParentese token_simboloDoisPontos AVALIE_CASO token_fimAvalie
+
+        Arvore* avalie = inicializaArvore(TIPO_LITERAL, "avalie", NULL, NULL);
+        Arvore* casos = inicializaArvore(TIPO_LITERAL, "casos", NULL, NULL);
+        Arvore* ident = inicializaArvore(TIPO_LITERAL, identificador, NULL, NULL);
+        avalie = setFilhosEsquerdaCentroDireita(avalie, ident, casos, NULL);
+        pilhaNiveis = empilhar(pilhaNiveis, avalie);
+        pilhaNiveis = empilhar(pilhaNiveis, casos);
+    } token_simboloFechaParentese token_simboloDoisPontos AVALIE_CASO {
+        Arvore* casos = getArvoreTopoPilha(pilhaNiveis);
+        pilhaNiveis = desempilhar(pilhaNiveis);
+        Arvore* avalie = getArvoreTopoPilha(pilhaNiveis);
+        pilhaNiveis = desempilhar(pilhaNiveis);
+        avalie = setFilhosEsquerdaCentroDireita(avalie, NULL, casos, NULL);
+        arvoreComandoAtual = avalie;
+    } token_fimAvalie
     ;
 
 AVALIE_CASO
-    : AVALIE_CASO token_caso INTEIRO token_simboloDoisPontos LISTA_COMANDOS token_pare token_simboloPontoVirgula
-    | token_caso INTEIRO token_simboloDoisPontos LISTA_COMANDOS token_pare token_simboloPontoVirgula
+    : AVALIE_CASO token_caso INTEIRO {
+        Arvore* ArvExp = getArvoreTopoPilha(p);
+        p = desempilhar(p);
+        Arvore* caso = inicializaArvore(TIPO_LITERAL, "caso", NULL, NULL);
+        caso = setFilhosEsquerdaCentroDireita(caso, ArvExp, NULL, NULL);
+        pilhaNiveis = empilhar(pilhaNiveis, caso);
+    } token_simboloDoisPontos LISTA_COMANDOS {
+        Arvore* caso = getArvoreTopoPilha(pilhaNiveis);
+        pilhaNiveis = desempilhar(pilhaNiveis);
+        Arvore* casos = getArvoreTopoPilha(pilhaNiveis);
+        pilhaNiveis = desempilhar(pilhaNiveis);
+        casos = setProxComando(casos, caso);
+        pilhaNiveis = empilhar(pilhaNiveis, casos);
+    } token_pare token_simboloPontoVirgula
+    | token_caso INTEIRO {
+        Arvore* ArvExp = getArvoreTopoPilha(p);
+        p = desempilhar(p);
+        Arvore* caso = inicializaArvore(TIPO_LITERAL, "caso", NULL, NULL);
+        caso = setFilhosEsquerdaCentroDireita(caso, ArvExp, NULL, NULL);
+        pilhaNiveis = empilhar(pilhaNiveis, caso);
+    } token_simboloDoisPontos LISTA_COMANDOS {
+        Arvore* caso = getArvoreTopoPilha(pilhaNiveis);
+        pilhaNiveis = desempilhar(pilhaNiveis);
+        Arvore* casos = getArvoreTopoPilha(pilhaNiveis);
+        pilhaNiveis = desempilhar(pilhaNiveis);
+        casos = setProxComando(casos, caso);
+        pilhaNiveis = empilhar(pilhaNiveis, casos);
+    } token_pare token_simboloPontoVirgula
     ;
 
 COMANDO_LEIA

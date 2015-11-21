@@ -12,7 +12,7 @@ variaveis
 fim-variaveis
 
 inicio
-  operacao = 15 + 10*10;
+ /* operacao = 15 + 10*10;
   operacao = 15 + 10*5;
   operacao++;
   ++operacao;
@@ -55,4 +55,40 @@ inicio
   			operacao = 3;
   		fim-se
 
+  enquanto operacao > 0 faca
+	operacao--;
+	imprima("Tempo restante ");
+	imprima(operacao);
+	fim-enquanto
+
+	operacao = 15 + 10*10;
+  operacao = 15 + 10*5;
+  operacao++;
+  ++operacao;
+
+  faca:
+		operacao--;
+		imprima("Tempo restante ");
+    	imprima(operacao);
+	enquanto (operacao > 3)
+	fim-enquanto
+	*/
+
+	avalie (operacao):
+        caso 1:
+          operacao = operacao*2;
+          pare;
+        caso 2:
+          operacao = operacao*5;
+          pare;
+        caso 3:
+          operacao = operacao*6;
+          pare;
+        caso 4:
+          operacao = operacao*10;
+          pare;
+        caso 5:
+          operacao = operacao*7;
+          pare;
+      fim-avalie
 fim
