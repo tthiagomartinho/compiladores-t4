@@ -129,14 +129,14 @@ void print ( Arvore *root, int level ){
         printf("IMPRIMINDO LISTA\n");
         for(aux = l; aux != NULL; aux = aux -> prox){
             switch(aux -> tipo){
-                case TIPO_LITERAL:
-                    printf("%s\n", (char*) aux->info);
-                    break;
                 case TIPO_ARVORE:{
                     Arvore* ab = (Arvore*) aux->info;
                     imprimirArvoreComandos(ab);
                     break;
                 }
+                default:
+                    printf("%s\n", (char*) aux->info);
+                    break;
             }
         }
         printf("FIM DA IMPRESSAO DA LISTA\n");

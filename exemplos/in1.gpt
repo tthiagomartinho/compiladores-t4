@@ -11,6 +11,14 @@ variaveis
   l : logico;
 fim-variaveis
 
+funcao adicao (v1 : inteiro, v2 : inteiro) : inteiro
+  total : inteiro;
+  inicio
+    total = v1 + v2;
+    retorne (total);
+  fim
+fim-funcao
+
 inicio
  /* operacao = 15 + 10*10;
   operacao = 15 + 10*5;
@@ -73,7 +81,7 @@ inicio
 	enquanto (operacao > 3)
 	fim-enquanto
 	*/
-
+/*
 	avalie (operacao):
         caso 1:
           operacao = operacao*2;
@@ -91,4 +99,7 @@ inicio
           operacao = operacao*7;
           pare;
       fim-avalie
+      */
+
+      operacao = adicao(operacao, operacao);
 fim

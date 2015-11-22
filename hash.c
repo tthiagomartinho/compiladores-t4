@@ -425,24 +425,23 @@ char* getNomeFuncao(Funcao* funcao) {
 }
 
 int isChamadaFuncaoValida(Funcao* funcao, Lista* parametrosFuncao){ 
-    if(funcao->aridade = 0 && parametrosFuncao == NULL){
-	return 1;
+    if(funcao->aridade == 0 && parametrosFuncao == NULL){
+	   return 1;
     }
     int quantidadeParametros = 0;
     Lista* l;
     for(l = parametrosFuncao; l != NULL; l = l->prox){
         quantidadeParametros++;
     }
-printf("%d \n", funcao->aridade);
     if(funcao->aridade != quantidadeParametros){
-	return 0;
+	   return 0;
     }
     int i = 0;
     for(l = parametrosFuncao; l != NULL; l = l->prox){
         if(l->tipo != funcao->tipoParametros[i]){
-	    return 0;
-	}
-	i++;
+	       return 0;
+	   }
+	   i++;
     }
     return 1;
 }

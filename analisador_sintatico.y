@@ -31,6 +31,7 @@
     char* nomePrograma;
     Pilha* pilhaNiveis = NULL;
     Lista* comandosRepeticao = NULL;
+    Arvore* arvoreParametrosFuncao = NULL;
 
 
     void liberarMemoriaAlocada() {
@@ -392,9 +393,13 @@ LISTA_COMANDOS
         incluirComando();
     }
     | LISTA_COMANDOS COMANDO_CHAMADA_FUNCAO {
+        arvoreComandoAtual = getArvoreTopoPilha(pilhaNiveis);
+        pilhaNiveis = desempilhar(pilhaNiveis);
         incluirComando();
     } token_simboloPontoVirgula 
     | COMANDO_CHAMADA_FUNCAO {
+        arvoreComandoAtual = getArvoreTopoPilha(pilhaNiveis);
+        pilhaNiveis = desempilhar(pilhaNiveis);
         incluirComando();
     } token_simboloPontoVirgula
     | LISTA_COMANDOS COMANDO_SE {
@@ -480,12 +485,18 @@ VALOR_A_SER_ATRIBUIDO
         if(tipoRetornoFuncao != tipoExpressaoAtribuicao){
             finalizarProgramaComErro("Tipo invalido associado a variavel");
         }
+        Arvore* func = getArvoreTopoPilha(pilhaNiveis);
+        pilhaNiveis = desempilhar(pilhaNiveis);
+        arvoreComandoAtual = setFilhosEsquerdaCentroDireita(arvoreComandoAtual, NULL, func, NULL);
     }
     | COMANDO_CHAMADA_FUNCAO {
         int tipoRetornoFuncao = getTipoRetornoFuncao(hashFuncao, funcao);
         if(tipoRetornoFuncao != tipoExpressaoAtribuicao){
             finalizarProgramaComErro("Tipo invalido associado a variavel");
         }
+        Arvore* func = getArvoreTopoPilha(pilhaNiveis);
+        pilhaNiveis = desempilhar(pilhaNiveis);
+        arvoreComandoAtual = setFilhosEsquerdaCentroDireita(arvoreComandoAtual, NULL, func, NULL);
     }
     ;
 
@@ -751,27 +762,49 @@ COMANDO_IMPRIMA
     } token_simboloFechaParentese token_simboloPontoVirgula
     ;
 
-PARAMETROS_FUNCAO
-    : PARAMETROS_FUNCAO token_simboloVirgula POSSIVEIS_PARAMETROS {
+ PARAMETROS_FUNCAO
+     : PARAMETROS_FUNCAO token_simboloVirgula POSSIVEIS_PARAMETROS {
+         printf("%s\n", yytext);
+         parametrosFuncao = criarNovoNoListaFim(tipo, yytext, parametrosFuncao);
+     }
+     | POSSIVEIS_PARAMETROS {
         parametrosFuncao = criarNovoNoListaFim(tipo, yytext, parametrosFuncao);
-    }
-    | POSSIVEIS_PARAMETROS {
-       parametrosFuncao = criarNovoNoListaFim(tipo, yytext, parametrosFuncao);
+        printf("%s\n", yytext);
+     }
+     ;
+// PARAMETROS_FUNCAO
+//     : PARAMETROS_FUNCAO token_simboloVirgula POSSIVEIS_PARAMETROS 
+//     | POSSIVEIS_PARAMETROS
+//     ;
+
+POSSIVEIS_PARAMETROS
+    : FATOR {
+        Arvore* topo = getArvoreTopoPilha(p);
+        p = desempilhar(p);
+        p = NULL;
+        arvoreParametrosFuncao = setProxComando(arvoreParametrosFuncao, topo);
     }
     ;
 
-POSSIVEIS_PARAMETROS
-    : token_identificador {
-       Variavel* v = validarIdentificadorSairCasoInvalido();
-       tipo = getTipoVariavel(v);
-    }
-    | NUMERO 
-    | ACESSO_MATRIZ 
-    | LOGICO {
-        tipo = TIPO_LOGICO; 
-    }
-    | CARACTERE_LITERAL
-    ;
+// VALORES_EXPRESSAO
+//     : NUMERO
+//     | ACESSO_MATRIZ
+//     | LOGICO 
+//     | CARACTERE_LITERAL
+//     ;
+
+// POSSIVEIS_PARAMETROS
+//     : token_identificador {
+//        Variavel* v = validarIdentificadorSairCasoInvalido();
+//        tipo = getTipoVariavel(v);
+//     }
+//     | NUMERO 
+//     | ACESSO_MATRIZ 
+//     | LOGICO {
+//         tipo = TIPO_LOGICO; 
+//     }
+//     | CARACTERE_LITERAL
+//     ;
 
 COMANDO_CHAMADA_FUNCAO
     : token_identificador token_simboloAbreParentese {
@@ -780,11 +813,22 @@ COMANDO_CHAMADA_FUNCAO
             finalizarProgramaComErro("A funcao nao foi declarada");
         }
         parametrosFuncao = liberarMemoriaLista(parametrosFuncao);
+
+        Arvore* func = inicializaArvore(TIPO_FUNCAO, identificador, NULL, NULL);
+        pilhaNiveis = empilhar(pilhaNiveis, func);
+
     } COMANDO_CHAMADA_FUNCAO2 {
         if(isChamadaFuncaoValida(funcao, parametrosFuncao) == 0){
            finalizarProgramaComErro("Parametros passados na chamada de funcao nao condizem com a declaracao");
        }
-       parametrosFuncao = liberarMemoriaLista(parametrosFuncao);
+
+       Arvore* func = getArvoreTopoPilha(pilhaNiveis);
+       pilhaNiveis = desempilhar(pilhaNiveis);
+       func = setFilhosEsquerdaCentroDireita(func, NULL, arvoreParametrosFuncao, NULL);
+       pilhaNiveis = empilhar(pilhaNiveis, func);
+
+       parametrosFuncao = NULL;
+       arvoreParametrosFuncao = NULL;
     }
     ;
 
@@ -1002,7 +1046,7 @@ main(){
  //   imprimirTabelaHash(hashVariavel);
  //   printf("\n");
  //   printf("IMPRIMINDO FUNCOES\n");
-   // imprimirTabelaHashFuncao(hashFuncao);
+ //imprimirTabelaHashFuncao(hashFuncao);
   //  imprimirRelatorioVariaveisNaoUtilizadas(hashVariavel);
     liberarMemoriaAlocada();
 }
