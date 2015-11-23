@@ -1,14 +1,22 @@
 #include "Executor.h"
 
-int avaliaExpressaoInteiro (Arvore* a, Lista** tabelaVariavel, Arvore* arvoreVariavel) {
+int avaliaExpressaoInteiro (Arvore* a, Lista** hashVariavel, Lista** hashFuncao) {
 	if(ehNoFolha(a)){
 		int tipo = getTipoNo(a);
 		switch(tipo){
 			case TIPO_INTEIRO:
 				return atoi(getValorNo(a));
 				break;
-			case TIPO_VARIAVEL:{
-				Variavel* v = buscarVariavelTabelaHash(tabelaVariavel, getValorNo(a), getEscopo(a));
+			case TIPO_LOGICO:{
+				char* valorNo = a->valorNo;
+				if(strcmp(valorNo, "verdadeiro") == 0){
+					return 1;
+				}else{
+					return 0;
+				}
+				break;
+			}case TIPO_VARIAVEL:{
+				Variavel* v = buscarVariavelTabelaHash(hashVariavel, getValorNo(a), getEscopo(a));
 				int i = *((int*) getValorVariavel(v));
 				return i;
 			}default:
@@ -16,79 +24,277 @@ int avaliaExpressaoInteiro (Arvore* a, Lista** tabelaVariavel, Arvore* arvoreVar
 		}       
 	}else{
 		if(strcmp(getValorNo(a), "+") == 0){
-			return avaliarExpressao(getFilhoEsquerda(a), tabelaVariavel) + avaliarExpressao(getFilhoCentro(a), tabelaVariavel);
+			return avaliaExpressaoInteiro(getFilhoCentro(a), hashVariavel, hashFuncao) + avaliaExpressaoInteiro(getFilhoEsquerda(a), hashVariavel, hashFuncao);
 		}else if(strcmp(getValorNo(a), "-") == 0){
-			return avaliarExpressao(getFilhoEsquerda(a), tabelaVariavel) - avaliarExpressao(getFilhoCentro(a), tabelaVariavel);
-		}else	if(strcmp(getValorNo(a), "*") == 0){
-			return avaliarExpressao(getFilhoEsquerda(a), tabelaVariavel) * avaliarExpressao(getFilhoCentro(a), tabelaVariavel);
-		} else if(strcmp(getValorNo(a), "=") == 0){
-			return avaliarExpressao(getFilhoCentro(a), tabelaVariavel);
+			return avaliaExpressaoInteiro(getFilhoCentro(a), hashVariavel, hashFuncao) - avaliaExpressaoInteiro(getFilhoEsquerda(a), hashVariavel, hashFuncao);
+		}else if(strcmp(getValorNo(a), "*") == 0){
+			return avaliaExpressaoInteiro(getFilhoCentro(a), hashVariavel, hashFuncao) * avaliaExpressaoInteiro(getFilhoEsquerda(a), hashVariavel, hashFuncao);
+		}else if(strcmp(getValorNo(a), "/") == 0){
+			return avaliaExpressaoInteiro(getFilhoCentro(a), hashVariavel, hashFuncao) / avaliaExpressaoInteiro(getFilhoEsquerda(a), hashVariavel, hashFuncao);
+		}else if(strcmp(getValorNo(a), "^") == 0){
+			return avaliaExpressaoInteiro(getFilhoCentro(a), hashVariavel, hashFuncao) ^ avaliaExpressaoInteiro(getFilhoEsquerda(a), hashVariavel, hashFuncao);
+		}else if(strcmp(getValorNo(a), "%") == 0){
+			return avaliaExpressaoInteiro(getFilhoCentro(a), hashVariavel, hashFuncao) % avaliaExpressaoInteiro(getFilhoEsquerda(a), hashVariavel, hashFuncao);
+		}else if(strcmp(getValorNo(a), ">") == 0){
+			return avaliaExpressaoInteiro(getFilhoCentro(a), hashVariavel, hashFuncao) > avaliaExpressaoInteiro(getFilhoEsquerda(a), hashVariavel, hashFuncao);
+		}else if(strcmp(getValorNo(a), "<") == 0){
+			return avaliaExpressaoInteiro(getFilhoCentro(a), hashVariavel, hashFuncao) < avaliaExpressaoInteiro(getFilhoEsquerda(a), hashVariavel, hashFuncao);
+		}else if(strcmp(getValorNo(a), "==") == 0){
+			return avaliaExpressaoInteiro(getFilhoCentro(a), hashVariavel, hashFuncao) == avaliaExpressaoInteiro(getFilhoEsquerda(a), hashVariavel, hashFuncao);
+		}else if(strcmp(getValorNo(a), ">=") == 0){
+			return avaliaExpressaoInteiro(getFilhoCentro(a), hashVariavel, hashFuncao) >= avaliaExpressaoInteiro(getFilhoEsquerda(a), hashVariavel, hashFuncao);
+		}else if(strcmp(getValorNo(a), "<=") == 0){
+			return avaliaExpressaoInteiro(getFilhoCentro(a), hashVariavel, hashFuncao) <= avaliaExpressaoInteiro(getFilhoEsquerda(a), hashVariavel, hashFuncao);
+		}else if(strcmp(getValorNo(a), "<>") == 0){
+			return avaliaExpressaoInteiro(getFilhoCentro(a), hashVariavel, hashFuncao) != avaliaExpressaoInteiro(getFilhoEsquerda(a), hashVariavel, hashFuncao);
+		}else if(strcmp(getValorNo(a), "e") == 0){
+			return avaliaExpressaoInteiro(getFilhoCentro(a), hashVariavel, hashFuncao) && avaliaExpressaoInteiro(getFilhoEsquerda(a), hashVariavel, hashFuncao);
+		}else if(strcmp(getValorNo(a), "ou") == 0){
+			return avaliaExpressaoInteiro(getFilhoCentro(a), hashVariavel, hashFuncao) || avaliaExpressaoInteiro(getFilhoEsquerda(a), hashVariavel, hashFuncao);
+		}else if(strcmp(getValorNo(a), "nao") == 0){
+			return !avaliaExpressaoInteiro(getFilhoEsquerda(a), hashVariavel, hashFuncao);
 		}
 	}
-	return 0;
 }
 
-int avaliaExpressaoReal (Arvore* a, Lista** tabelaVariavel, Arvore* arvoreVariavel) {
+float avaliaExpressaoReal (Arvore* a, Lista** hashVariavel, Lista** hashFuncao) {
 	if(ehNoFolha(a)){
 		int tipo = getTipoNo(a);
 		switch(tipo){
 			case TIPO_REAL:
-				return atoi(getValorNo(a));
+				return atof(getValorNo(a));
 				break;
 			case TIPO_VARIAVEL:{
-				Variavel* v = buscarVariavelTabelaHash(tabelaVariavel, getValorNo(a), getEscopo(a));
-				int i = *((int*) getValorVariavel(v));
+				Variavel* v = buscarVariavelTabelaHash(hashVariavel, getValorNo(a), getEscopo(a));
+				float i = *((float*) getValorVariavel(v));
 				return i;
 			}default:
 			break;
-		}       
+		}           
 	}else{
 		if(strcmp(getValorNo(a), "+") == 0){
-			return avaliarExpressao(getFilhoEsquerda(a), tabelaVariavel) + avaliarExpressao(getFilhoCentro(a), tabelaVariavel);
+			return avaliaExpressaoReal(getFilhoCentro(a), hashVariavel, hashFuncao) + avaliaExpressaoReal(getFilhoEsquerda(a), hashVariavel, hashFuncao);
 		}else if(strcmp(getValorNo(a), "-") == 0){
-			return avaliarExpressao(getFilhoEsquerda(a), tabelaVariavel) - avaliarExpressao(getFilhoCentro(a), tabelaVariavel);
-		}else	if(strcmp(getValorNo(a), "*") == 0){
-			return avaliarExpressao(getFilhoEsquerda(a), tabelaVariavel) * avaliarExpressao(getFilhoCentro(a), tabelaVariavel);
-		} else if(strcmp(getValorNo(a), "=") == 0){
-			return avaliarExpressao(getFilhoCentro(a), tabelaVariavel);
+			return avaliaExpressaoReal(getFilhoCentro(a), hashVariavel, hashFuncao) - avaliaExpressaoReal(getFilhoEsquerda(a), hashVariavel, hashFuncao);
+		}else if(strcmp(getValorNo(a), "*") == 0){
+			return avaliaExpressaoReal(getFilhoCentro(a), hashVariavel, hashFuncao) * avaliaExpressaoReal(getFilhoEsquerda(a), hashVariavel, hashFuncao);
+		}else if(strcmp(getValorNo(a), "/") == 0){
+			return avaliaExpressaoReal(getFilhoCentro(a), hashVariavel, hashFuncao) / avaliaExpressaoReal(getFilhoEsquerda(a), hashVariavel, hashFuncao);
+		}else if(strcmp(getValorNo(a), ">") == 0){
+			return avaliaExpressaoReal(getFilhoCentro(a), hashVariavel, hashFuncao) > avaliaExpressaoReal(getFilhoEsquerda(a), hashVariavel, hashFuncao);
+		}else if(strcmp(getValorNo(a), "<") == 0){
+			return avaliaExpressaoReal(getFilhoCentro(a), hashVariavel, hashFuncao) < avaliaExpressaoReal(getFilhoEsquerda(a), hashVariavel, hashFuncao);
+		}else if(strcmp(getValorNo(a), "==") == 0){
+			return avaliaExpressaoReal(getFilhoCentro(a), hashVariavel, hashFuncao) == avaliaExpressaoReal(getFilhoEsquerda(a), hashVariavel, hashFuncao);
+		}else if(strcmp(getValorNo(a), ">=") == 0){
+			return avaliaExpressaoReal(getFilhoCentro(a), hashVariavel, hashFuncao) >= avaliaExpressaoReal(getFilhoEsquerda(a), hashVariavel, hashFuncao);
+		}else if(strcmp(getValorNo(a), "<=") == 0){
+			return avaliaExpressaoReal(getFilhoCentro(a), hashVariavel, hashFuncao) <= avaliaExpressaoReal(getFilhoEsquerda(a), hashVariavel, hashFuncao);
+		}else if(strcmp(getValorNo(a), "<>") == 0){
+			return avaliaExpressaoReal(getFilhoCentro(a), hashVariavel, hashFuncao) != avaliaExpressaoReal(getFilhoEsquerda(a), hashVariavel, hashFuncao);
+		}else if(strcmp(getValorNo(a), "e") == 0){
+			return avaliaExpressaoReal(getFilhoCentro(a), hashVariavel, hashFuncao) && avaliaExpressaoReal(getFilhoEsquerda(a), hashVariavel, hashFuncao);
+		}else if(strcmp(getValorNo(a), "ou") == 0){
+			return avaliaExpressaoReal(getFilhoCentro(a), hashVariavel, hashFuncao) || avaliaExpressaoReal(getFilhoEsquerda(a), hashVariavel, hashFuncao);
+		}else if(strcmp(getValorNo(a), "nao") == 0){
+			return !avaliaExpressaoReal(getFilhoEsquerda(a), hashVariavel, hashFuncao);
 		}
 	}
 }
+int avaliaExpressaoLogica (Arvore* a, Lista** hashVariavel, Lista** hashFuncao){
+	int tipoExpressaoLogica = getTipoExpressaoLogica(a, hashVariavel, hashFuncao);
+	if(tipoExpressaoLogica == TIPO_REAL){
+		float valor = avaliaExpressaoReal (a, hashVariavel, hashFuncao);
+		return valor > 0;
+	}else{
+		return avaliaExpressaoInteiro (a, hashVariavel, hashFuncao);
+	}
+}
 
-void avaliaExpressaoAtribuicao(Arvore* a, Lista** tabelaVariavel) {
-	Arvore* arvoreVariavel = getFilhoEsquerda(a);
+int getTipoExpressaoLogica(Arvore* a, Lista** hashVariavel, Lista** hashFuncao){
+	if(ehNoFolha(a)){
+		int tipo = getTipoNo(a);
+		int tipoRetorno;
+		switch(tipo){
+			case TIPO_REAL:
+				tipoRetorno = TIPO_REAL;
+				break;
+			case TIPO_VARIAVEL:{
+				Variavel* v = buscarVariavelTabelaHash(hashVariavel, getValorNo(a), getEscopo(a));
+				tipoRetorno = getTipoVariavel(v);
+				break;
+			}default:
+				tipoRetorno = TIPO_INTEIRO;
+				break;
+		}
+		return tipoRetorno;       
+	}else{
+		return getTipoExpressaoLogica(getFilhoEsquerda(a), hashVariavel, hashFuncao);
+	}
+}
+
+void executarAtribuicao(Arvore* comandoAtual, Lista** hashVariavel, Lista** hashFuncao) {
+	int funcao = 0;
+	Arvore* variavelASerAtribuida = getFilhoEsquerda(comandoAtual);
+	Arvore* comandoASerExecutado = getFilhoCentro(comandoAtual);
 	
 	// Verifica qual o tipo da variável 
-	Variavel* variavel = buscarVariavelTabelaHash(tabelaVariavel, getValorNo(arvoreVariavel), getEscopo(arvoreVariavel));
+	Variavel* variavel = buscarVariavelTabelaHash(hashVariavel, getValorNo(variavelASerAtribuida), getEscopo(variavelASerAtribuida));
 	int tipoVariavel = getTipoVariavel(variavel);
-	
+
+	if(comandoASerExecutado->tipo == TIPO_FUNCAO){
+		funcao = 1;
+	} else if(strcmp(comandoASerExecutado->valorNo, "leia") == 0){
+		executarLeia(variavel);
+
+		return;
+	}
+
 	switch (tipoVariavel) {
-		case TIPO_INTEIRO:
-		//	int valor = avaliaExpressaoInteiro (a, tabelaVariavel, arvoreVariavel);
-		//	setVariavelValor(variavel, &valor, TIPO_INTEIRO);
+		case TIPO_INTEIRO:{
+			int valor;
+			if(funcao == 1){
+				//valor = executarFuncao();
+			}else{
+				valor = avaliaExpressaoInteiro (comandoASerExecutado, hashVariavel, hashFuncao);
+			}
+			setVariavelValor(variavel, &valor, TIPO_INTEIRO);
 			break;
-		case TIPO_REAL:
-		//	variavel->valor = avaliaExpressaoReal (a, tabelaVariavel, arvoreVariavel);
+		}case TIPO_REAL:{
+			float valor;
+			if(funcao == 1){
+				//valor = executarFuncao();
+			}else{
+				valor = avaliaExpressaoReal (comandoASerExecutado, hashVariavel, hashFuncao);
+			}
+			setVariavelValor(variavel, &valor, TIPO_REAL);
 			break;
-		default:
+		}case TIPO_LOGICO:{
+			int valor;
+			if(funcao == 1){
+				//valor = executarFuncao();
+			}else{
+				valor = avaliaExpressaoLogica (comandoASerExecutado, hashVariavel, hashFuncao);
+			}
+			setVariavelValor(variavel, &valor, TIPO_INTEIRO);
+			break;
+		}default:
 			break;
 	}
 }
 
-void identificaOperacao(Lista* listaArvores, Lista** tabelaVariavel) {
-	if (listaArvores == NULL) {
-		printf ("listaArvores está vazia!\n");
-		return;
+void executarLeia(Variavel* variavel){
+	switch(getTipoVariavel(variavel)){
+		case TIPO_INTEIRO:{
+			int valor;
+			scanf(" %d", &valor);
+			setVariavelValor(variavel, &valor, TIPO_INTEIRO);
+			break;
+		}
+		case TIPO_LOGICO:{
+			int valor;
+			scanf(" %d", &valor);
+			setVariavelValor(variavel, &valor, TIPO_LOGICO);
+			break;
+		}
+		case TIPO_REAL: {
+			float valor;
+			scanf(" %f", &valor);
+			setVariavelValor(variavel, &valor, TIPO_REAL);
+			break;
+		}
+		case TIPO_LITERAL: {
+			char valor[255];
+    		fgets(valor, sizeof valor, stdin);
+			setVariavelValor(variavel, valor, TIPO_LITERAL);
+			break;
+		}
+		case TIPO_CARACTERE: {
+			char valor[255];
+    		fgets(valor, sizeof valor, stdin);
+			setVariavelValor(variavel, valor, TIPO_LITERAL);
+			break;
+		}
+		default:
+		break;
 	}
-	
-	while (listaArvores != NULL) {
-		Arvore* a = listaArvores->info;
-		
-		int tipo = getTipoNo(a);
-		switch (tipo){
-			case EXECUTOR_ATRIBUICAO:
-				avaliaExpressaoAtribuicao (a, tabelaVariavel);
+
+}
+
+void executarImprima(Arvore* comandoAtual, Lista** hashVariavel){
+	Arvore* valorParaImprimir = getFilhoEsquerda(comandoAtual);
+	if(valorParaImprimir->tipo == TIPO_VARIAVEL){
+		Variavel* v = buscarVariavelTabelaHash(hashVariavel, getValorNo(valorParaImprimir), getEscopo(valorParaImprimir));
+		switch(getTipoVariavel(v)){
+			case TIPO_INTEIRO:
+				printf("%d\n", *((int*)getValorVariavel(v)));
 				break;
+			case TIPO_LOGICO:{
+				int valor = *((int*)getValorVariavel(v));
+				if(valor == 0){
+					printf("falso\n");
+				}else{
+					printf("verdadeiro\n");
+				}
+				break;
+			}case TIPO_REAL: 
+				printf("%f\n", *((float*)getValorVariavel(v)));
+				break;
+			default:
+				printf("%s\n", (char*)getValorVariavel(v));
+			break;
+		}
+	}else{
+		printf("%s\n", (char*)getValorNo(valorParaImprimir));
+	}
+
+	
+}
+
+void exetuarPrograma(Arvore* programa, Lista** hashVariavel, Lista** hashFuncao){
+    if (programa == NULL) {
+      printf ("listaArvores está vazia!\n");
+      return;
+    }
+    Arvore* arvoreComandos = getFilhoEsquerda(programa);
+    Arvore* comandoAtual;
+    
+    for(comandoAtual = arvoreComandos; comandoAtual != NULL; comandoAtual = comandoAtual -> prox){
+        char* comando = (char*) getValorNo(comandoAtual);
+        if(strcmp(comando, "=") == 0){
+            executarAtribuicao(comandoAtual, hashVariavel, hashFuncao);
+        } else if(strcmp(comando, "imprima") == 0){
+            executarImprima(comandoAtual, hashVariavel);
+        } else if(strcmp(comando, "") == 0){
+            
+        } else if(strcmp(comando, "") == 0){
+            
+        } else if(strcmp(comando, "") == 0){
+            
+        } else if(strcmp(comando, "") == 0){
+            
+        } else if(strcmp(comando, "") == 0){
+            
+        } else if(strcmp(comando, "") == 0){
+            
+        } else if(strcmp(comando, "") == 0){
+            
+        } else if(strcmp(comando, "") == 0){
+            
+        }  {
+            
+        }
+    
+    }
+	
+//	while (listaArvores != NULL) {
+//		Arvore* a = listaArvores->info;
+		
+//		int tipo = getTipoNo(a);
+//		switch (tipo){
+//			case EXECUTOR_ATRIBUICAO:
+//				avaliaExpressaoAtribuicao (a, tabelaVariavel);
+//				break;
 		/*	case EXECUTOR_ENQUANTO:
 				//avaliaExpressaoEnquanto (a, tabelaVariavel);
 				break;
@@ -119,62 +325,11 @@ void identificaOperacao(Lista* listaArvores, Lista** tabelaVariavel) {
 			case EXECUTOR_CHAMADA_FUNCAO:
 				//avaliaExpressaoFacaEnquanto (a, tabelaVariavel);
 				break;	*/
-			default:
-				break;
-		}
-		
-		listaArvores = listaArvores->prox;
-	}
+	//		default:
+	//			break;
+//		}
+//		
+//		listaArvores = listaArvores->prox;
+//	}
 	
 }
-
-int avaliarExpressao(Arvore* a, Lista** tabelaVariavel){
-    if(ehNoFolha(a)){
-        int tipo = getTipoNo(a);
-        switch(tipo){
-            case TIPO_INTEIRO:
-                return atoi(getValorNo(a));
-                break;
-            case TIPO_VARIAVEL:{
-                Variavel* v = buscarVariavelTabelaHash(tabelaVariavel, getValorNo(a), getEscopo(a));
-                int i = *((int*) getValorVariavel(v));
-                return i;
-            }default:
-                break;
-        }       
-    }else{
-        if(strcmp(getValorNo(a), "+") == 0){
-            return avaliarExpressao(getFilhoEsquerda(a), tabelaVariavel) + avaliarExpressao(getFilhoCentro(a), tabelaVariavel);
-        }else if(strcmp(getValorNo(a), "*") == 0){
-            return avaliarExpressao(getFilhoEsquerda(a), tabelaVariavel) * avaliarExpressao(getFilhoCentro(a), tabelaVariavel);
-        } else if(strcmp(getValorNo(a), "=") == 0){
-            return avaliarExpressao(getFilhoCentro(a), tabelaVariavel);
-        }
-    }
-}
-
-int avaliarExpressaoInteiro(Arvore* a, Lista** tabelaVariavel){
-	if(ehNoFolha(a)){
-		int tipo = getTipoNo(a);
-		switch(tipo){
-			case TIPO_INTEIRO:
-				return atoi(getValorNo(a));
-				break;
-			case TIPO_VARIAVEL:{
-				Variavel* v = buscarVariavelTabelaHash(tabelaVariavel, getValorNo(a), getEscopo(a));
-				int i = *((int*) getValorVariavel(v));
-				return i;
-			}default:
-			break;
-		}       
-	}else{
-		if(strcmp(getValorNo(a), "+") == 0){
-			return avaliarExpressao(getFilhoEsquerda(a), tabelaVariavel) + avaliarExpressao(getFilhoCentro(a), tabelaVariavel);
-		}else if(strcmp(getValorNo(a), "*") == 0){
-			return avaliarExpressao(getFilhoEsquerda(a), tabelaVariavel) * avaliarExpressao(getFilhoCentro(a), tabelaVariavel);
-		} else if(strcmp(getValorNo(a), "=") == 0){
-			return avaliarExpressao(getFilhoCentro(a), tabelaVariavel);
-		}
-	}
-}
-

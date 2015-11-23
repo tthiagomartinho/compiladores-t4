@@ -355,14 +355,12 @@ PROGRAMA_PRINCIPAL
     : token_inicio{
         strcpy(escopo, "global");
         programa = inicializaArvore(TIPO_LITERAL, nomePrograma, NULL, NULL);
-        //Arvore* esquerda = getFilhoEsquerda(programa);
-        pilhaNiveis = empilhar(pilhaNiveis, programa);
+        pilhaNiveis = empilhar(pilhaNiveis, NULL);
     } LISTA_COMANDOS {
-       // Arvore* inicializaArvore(int tipo, void* valor, char* escopo, Lista* dimensoesMatriz)
-        //Arvore* arvoreComandos = inicializaArvore(TIPO_LISTA, listaComandos, NULL, NULL);
-        
-        //programa = setFilhosEsquerdaCentroDireita(programa, arvoreComandos, NULL, NULL);
-        imprimirArvoreComandos(programa);
+        Arvore* comandos = getArvoreTopoPilha(pilhaNiveis);
+        pilhaNiveis = desempilhar(pilhaNiveis);
+        programa = setFilhosEsquerdaCentroDireita(programa, comandos, NULL, NULL);
+     //   imprimirArvoreComandos(programa);
     } token_fim
     | token_inicio token_fim
     ;
@@ -421,14 +419,13 @@ LISTA_COMANDOS
         incluirComando();
     }
     | LISTA_COMANDOS COMANDO_RETORNO {
-        incluirComando();
+      //  incluirComando();
     }
     | COMANDO_RETORNO {
-        
+      //  incluirComando();
     }
     | LISTA_COMANDOS COMANDO_MAIS_MAIS_MENOS_MENOS {
         incluirComando();
-        
     }
     | COMANDO_MAIS_MAIS_MENOS_MENOS {
         incluirComando();
@@ -677,7 +674,6 @@ COMANDO_AVALIE
     : token_avalie token_simboloAbreParentese token_identificador {
         Variavel* v = validarIdentificadorSairCasoInvalido();
         int tipoVariavel = getTipoVariavel(v);
-        printf("%d\n", tipoVariavel);
         if(tipoVariavel != TIPO_INTEIRO){
             finalizarProgramaComErro("Nao eh possivel avaliar variaveis cujo tipo nao eh inteiro");
         }
@@ -764,12 +760,10 @@ COMANDO_IMPRIMA
 
  PARAMETROS_FUNCAO
      : PARAMETROS_FUNCAO token_simboloVirgula POSSIVEIS_PARAMETROS {
-         printf("%s\n", yytext);
          parametrosFuncao = criarNovoNoListaFim(tipo, yytext, parametrosFuncao);
      }
      | POSSIVEIS_PARAMETROS {
         parametrosFuncao = criarNovoNoListaFim(tipo, yytext, parametrosFuncao);
-        printf("%s\n", yytext);
      }
      ;
 // PARAMETROS_FUNCAO
@@ -1001,7 +995,8 @@ LOGICO
         p = empilhar(p, novoNo);
     }
     | token_operadorNao {
-         p = empilharExpressaoOperador(p, "nao");
+        Arvore* novoNo = inicializaArvore(TIPO_LOGICO, "nao", NULL, NULL);
+        p = empilhar(p, novoNo);
     } FATOR
     ;
 
@@ -1042,8 +1037,9 @@ main(){
     variaveis = NULL;
     hashFuncao = inserirFuncoesInicias(hashFuncao);
     yyparse();
+    exetuarPrograma(programa, hashVariavel, hashFuncao);
  //   printf("IMPRIMINDO VARIAVEIS\n");
- //   imprimirTabelaHash(hashVariavel);
+  //  imprimirTabelaHash(hashVariavel);
  //   printf("\n");
  //   printf("IMPRIMINDO FUNCOES\n");
  //imprimirTabelaHashFuncao(hashFuncao);

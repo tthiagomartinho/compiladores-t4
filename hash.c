@@ -224,6 +224,10 @@ void* getValorVariavel(Variavel* v){
     return v->valor;
 }
 
+void setValorInteiro(Variavel* v, int valor){
+    memcpy(v->valor, &valor, sizeof(int));
+}
+
 // setar valor da variável de acordo com o seu tipo
 void setVariavelValor (Variavel* v, void* valor, int tipo) {
 	int valorInteiro = 0;
@@ -232,15 +236,20 @@ void setVariavelValor (Variavel* v, void* valor, int tipo) {
 
 	switch (tipo) {
 		case TIPO_INTEIRO:
-		//	valorInteiro = *((int *) valor);
-		//	v->valor = &valorInteiro;
+			memcpy(v->valor, (int*) valor, sizeof(int));
 			return;
 		case TIPO_REAL:
-		//	valorReal = *((float *) valor);
-		//	v->valor = &valorReal;
+            memcpy(v->valor, (float*) valor, sizeof(float));
 			return;
+        case TIPO_CARACTERE:
+            strcpy(v->valor, valor);
+            return;
+        case TIPO_LITERAL:
+            strcpy(v->valor, valor);
+            return;
 		case TIPO_LOGICO:
-			valorLogico = *((int* ) valor);
+			memcpy(v->valor, (int*) valor, sizeof(int));
+            //valorLogico = *((int* ) valor);
 			/*
 			 * Se valorLogico > 0 setar o valor da variável para 1
 			 * Se valorLogico = 0 setar o valor da variável para 0
@@ -301,8 +310,18 @@ void imprimirTabelaHash(Lista** tabelaHash) {
             for (l = tabelaHash[i]; l != NULL; l = l->prox) {
                 Variavel* v = (Variavel*) l->info;
                 printf("Nome: %s\n", v-> nome);
-                printf("valor: %p\n", v-> valor);
                 printf("tipo: %d\n", v-> tipo);
+                if(v->tipo == TIPO_INTEIRO){
+                    printf("valor: %d\n", *((int*)v-> valor));
+                } else if (v->tipo == TIPO_REAL){
+                    printf("valor: %f\n", *((float*)v-> valor));
+                } else if (v->tipo == TIPO_LOGICO){
+                    printf("valor: %d\n", *((int*)v-> valor));
+                } else if (v->tipo == TIPO_LITERAL){
+                    printf("valor: %s\n", (char*) v-> valor);
+                }else{
+                    printf("valor: %p\n", v-> valor);
+                }
                 printf("escopo: %s\n", v-> escopo);
                 printf("usada: %d\n", v-> usada);
                 int i;
@@ -509,7 +528,6 @@ void imprimirLista(Lista* l) {
                 printf("Nome Variavel: %s\n", v->nome);
                 break;
             }
-
         }
     }
 }

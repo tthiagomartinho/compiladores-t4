@@ -13,6 +13,18 @@
 #define	EXECUTOR_MAIS_MAIS_MENOS_MENOS 9
 #define EXECUTOR_CHAMADA_FUNCAO 10
 
-int avaliarExpressao(Arvore* arvore, Lista** tabelaVariavel);
+int avaliaExpressaoInteiro (Arvore* a, Lista** hashVariavel, Lista** hashFuncao);
 
-int avaliarExpressaoInteiro(Arvore* arvore, Lista** tabelaVariavel);
+float avaliaExpressaoReal (Arvore* a, Lista** hashVariavel, Lista** hashFuncao);
+
+int avaliaExpressaoLogica (Arvore* a, Lista** hashVariavel, Lista** hashFuncao);
+
+int getTipoExpressaoLogica(Arvore* a, Lista** hashVariavel, Lista** hashFuncao);
+
+void executarAtribuicao(Arvore* comandoAtual, Lista** hashVariavel, Lista** hashFuncao);
+
+void executarLeia(Variavel* variavel);
+
+void executarImprima(Arvore* comandoAtual, Lista** hashVariavel);
+
+void exetuarPrograma(Arvore* programa, Lista** hashVariavel, Lista** hashFuncao);

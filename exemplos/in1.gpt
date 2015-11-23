@@ -101,5 +101,11 @@ inicio
       fim-avalie
       */
 
-      operacao = adicao(operacao, operacao);
+//		operacao = leia();
+     // imprima(operacao);
+     // imprima("\n");
+     l = 4 < 3;
+     imprima(l);
+     l = 4.2 > 3.1;
+     imprima(l);
 fim

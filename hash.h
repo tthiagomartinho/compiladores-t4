@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-    #include <stdio.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -73,6 +73,8 @@ Lista** inserirListaVariaveisTabelaHash(Lista** tabelaHash, Lista* dimensoesMatr
 void imprimirRelatorioVariaveisNaoUtilizadas(Lista** hashVariavel);
 
 void* getValorVariavel(Variavel* v);
+
+void setValorInteiro(Variavel* v, int valor);
 
 // seta o valor da variavel de acordo com o tipo passado
 void setVariavelValor (Variavel* v, void* valor, int tipo);
