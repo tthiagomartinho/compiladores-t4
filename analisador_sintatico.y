@@ -199,9 +199,9 @@ ALGORITMO
     ;
 
 PROGRAMA
-    : VARIAVEIS DECLARACAO_FUNCAO PROGRAMA_PRINCIPAL
+    : VARIAVEIS DECLARACAO_FUNCAO {p = NULL;} PROGRAMA_PRINCIPAL
     | VARIAVEIS PROGRAMA_PRINCIPAL
-    | DECLARACAO_FUNCAO PROGRAMA_PRINCIPAL
+    | DECLARACAO_FUNCAO {p = NULL;} PROGRAMA_PRINCIPAL
     | PROGRAMA_PRINCIPAL
     ;
 
@@ -360,7 +360,7 @@ PROGRAMA_PRINCIPAL
         Arvore* comandos = getArvoreTopoPilha(pilhaNiveis);
         pilhaNiveis = desempilhar(pilhaNiveis);
         programa = setFilhosEsquerdaCentroDireita(programa, comandos, NULL, NULL);
-     //   imprimirArvoreComandos(programa);
+       // imprimirArvoreComandos(programa);
     } token_fim
     | token_inicio token_fim
     ;
@@ -530,7 +530,8 @@ COMANDO_PARA
         if(tipoVariavel != TIPO_INTEIRO){
             finalizarProgramaComErro("Comando PARA dever iterar sob variaveis do tipo inteiro");
         }
-        comandosRepeticao = criarNovoNoListaFim(TIPO_LITERAL, identificador, comandosRepeticao);
+        Arvore* novoNo = inicializaArvore(TIPO_VARIAVEL, getNomeVariavel(v), getEscopoVariavel(v), NULL);
+        comandosRepeticao = criarNovoNoListaFim(TIPO_ARVORE, novoNo, comandosRepeticao);
     } token_de EXPRESSAO {
         tipoExpressaoAtribuicao = TIPO_INTEIRO;
         validarExpressaoSairCasoInvalido();
@@ -553,8 +554,8 @@ COMANDO_PARA2
         Arvore* para = inicializaArvore(TIPO_LITERAL, "para", NULL, NULL);
         Arvore* faca = inicializaArvore(TIPO_LITERAL, "faca", NULL, NULL);
         Arvore* lista = inicializaArvore(TIPO_LISTA, comandosRepeticao, NULL, NULL);
-        faca = setFilhosEsquerdaCentroDireita(faca, lista, NULL, NULL);
-        para = setFilhosEsquerdaCentroDireita(para, NULL, faca, NULL);
+        faca = setFilhosEsquerdaCentroDireita(faca, NULL, NULL, NULL);
+        para = setFilhosEsquerdaCentroDireita(para, lista, faca, NULL);
         pilhaNiveis = empilhar(pilhaNiveis, para);
         pilhaNiveis = empilhar(pilhaNiveis, faca);
         //pilhaNiveis = empilhar(pilhaNiveis, NULL);
@@ -568,19 +569,18 @@ COMANDO_PARA2
         arvoreComandoAtual = para;
     } token_fimPara
     | token_passo INTEIRO {
-        Arvore* ArvExp = getArvoreTopoPilha(p);
-        p = desempilhar(p);
-        p = NULL;
+        Arvore* ArvExp = inicializaArvore(TIPO_INTEIRO, yytext, NULL, NULL);
         comandosRepeticao = criarNovoNoListaFim(TIPO_ARVORE, ArvExp, comandosRepeticao);
         Arvore* para = inicializaArvore(TIPO_LITERAL, "para", NULL, NULL);
         Arvore* faca = inicializaArvore(TIPO_LITERAL, "faca", NULL, NULL);
         Arvore* lista = inicializaArvore(TIPO_LISTA, comandosRepeticao, NULL, NULL);
-        faca = setFilhosEsquerdaCentroDireita(faca, lista, NULL, NULL);
-        para = setFilhosEsquerdaCentroDireita(para, NULL, faca, NULL);
+        faca = setFilhosEsquerdaCentroDireita(faca, NULL, NULL, NULL);
+        para = setFilhosEsquerdaCentroDireita(para, lista, faca, NULL);
         pilhaNiveis = empilhar(pilhaNiveis, para);
         pilhaNiveis = empilhar(pilhaNiveis, faca);
        // pilhaNiveis = empilhar(pilhaNiveis, NULL);
         comandosRepeticao = NULL;
+        p = NULL;
 
     } token_faca LISTA_COMANDOS {
         Arvore* faca = getArvoreTopoPilha(pilhaNiveis);

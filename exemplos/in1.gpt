@@ -52,17 +52,32 @@ inicio
   ++operacao;
   imprima(operacao);
   operacao = leia(); 
-
-  para operacao de 0 ate 10 faca 
-    operacao = 10;
+*/
+  operacao = 0;
+  para operacao de 0 ate 10 passo 4 faca 
+    operacao = operacao + 10;
+    imprima(operacao);
   fim-para
 
+/*
+
   se (operacao == 2) entao
+  se (operacao == 2) entao
+  se (operacao == 2) entao
+        operacao = 2;
+      senao 
+        operacao = 3;
+      fim-se
+        operacao = 2;
+      senao 
+        operacao = 3;
+      fim-se
   			operacao = 2;
   		senao 
   			operacao = 3;
   		fim-se
-
+      */
+/*
   enquanto operacao > 0 faca
 	operacao--;
 	imprima("Tempo restante ");
@@ -73,6 +88,7 @@ inicio
   operacao = 15 + 10*5;
   operacao++;
   ++operacao;
+*/
 
   faca:
 		operacao--;
@@ -80,7 +96,6 @@ inicio
     	imprima(operacao);
 	enquanto (operacao > 3)
 	fim-enquanto
-	*/
 /*
 	avalie (operacao):
         caso 1:
@@ -104,8 +119,8 @@ inicio
 //		operacao = leia();
      // imprima(operacao);
      // imprima("\n");
-     l = 4 < 3;
-     imprima(l);
-     l = 4.2 > 3.1;
-     imprima(l);
+ //    l = 4 < 3;
+ //    imprima(l);
+ //    l = 4.2 > 3.1;
+ //    imprima(l);
 fim

@@ -50,7 +50,6 @@ Arvore* getArvoreTopoPilha(Pilha* p){
 
 /*Cria um novo no no inicio da lista*/
 Pilha* liberarPilha(Pilha* p) {
-	Pilha* pilha;
 	for(p; p != NULL; ){
 		Pilha* aux = p -> prox;	
 		p -> arvore = liberarArvore(p->arvore);

@@ -101,6 +101,7 @@ float avaliaExpressaoReal (Arvore* a, Lista** hashVariavel, Lista** hashFuncao) 
 		}
 	}
 }
+
 int avaliaExpressaoLogica (Arvore* a, Lista** hashVariavel, Lista** hashFuncao){
 	int tipoExpressaoLogica = getTipoExpressaoLogica(a, hashVariavel, hashFuncao);
 	if(tipoExpressaoLogica == TIPO_REAL){
@@ -146,7 +147,6 @@ void executarAtribuicao(Arvore* comandoAtual, Lista** hashVariavel, Lista** hash
 		funcao = 1;
 	} else if(strcmp(comandoASerExecutado->valorNo, "leia") == 0){
 		executarLeia(variavel);
-
 		return;
 	}
 
@@ -247,8 +247,40 @@ void executarImprima(Arvore* comandoAtual, Lista** hashVariavel){
 	}else{
 		printf("%s\n", (char*)getValorNo(valorParaImprimir));
 	}
+}
 
-	
+void executarPara(Arvore* comandoAtual, Lista** hashVariavel, Lista** hashFuncao){
+	Arvore* limitadores = getFilhoEsquerda(comandoAtual);
+	Arvore* para = getFilhoCentro(comandoAtual);
+	Lista* operador = (Lista*) getValorNo(limitadores);
+	Lista* deLista = operador->prox;
+	Lista* ateLista = deLista->prox;
+	Lista* passoLista = NULL;
+
+	int valorPasso = 0;
+	if(tamanhoLista(operador) == 4){
+		passoLista = ateLista->prox;
+		Arvore* passo = (Arvore*) passoLista->info;
+		valorPasso = atoi(getValorNo(passo));
+	}
+
+	Arvore* variavel = (Arvore*) operador->info;
+	Variavel* v = buscarVariavelTabelaHash(hashVariavel, getValorNo(variavel), getEscopo(variavel));
+
+	Arvore* de = (Arvore*) deLista->info;
+	int valorDe = atoi(getValorNo(de));
+
+	Arvore* ate = (Arvore*) ateLista->info;
+	int valorAte = atoi(getValorNo(ate));
+
+	int i;
+	for(i = valorDe; i < valorAte; i = i + valorPasso){
+		exetuarPrograma(para->prox, hashVariavel, hashFuncao);
+	}
+
+	// printf("PARA %s DE %d ATE %d PASSO %d\n", getValorNo(variavel), valorDe, valorAte, valorPasso);
+
+
 }
 
 void exetuarPrograma(Arvore* programa, Lista** hashVariavel, Lista** hashFuncao){
@@ -265,8 +297,8 @@ void exetuarPrograma(Arvore* programa, Lista** hashVariavel, Lista** hashFuncao)
             executarAtribuicao(comandoAtual, hashVariavel, hashFuncao);
         } else if(strcmp(comando, "imprima") == 0){
             executarImprima(comandoAtual, hashVariavel);
-        } else if(strcmp(comando, "") == 0){
-            
+        } else if(strcmp(comando, "para") == 0){
+            executarPara(comandoAtual, hashVariavel, hashFuncao);
         } else if(strcmp(comando, "") == 0){
             
         } else if(strcmp(comando, "") == 0){

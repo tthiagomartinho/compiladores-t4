@@ -27,4 +27,6 @@ void executarLeia(Variavel* variavel);
 
 void executarImprima(Arvore* comandoAtual, Lista** hashVariavel);
 
+void executarPara(Arvore* comandoAtual, Lista** hashVariavel, Lista** hashFuncao);
+
 void exetuarPrograma(Arvore* programa, Lista** hashVariavel, Lista** hashFuncao);
