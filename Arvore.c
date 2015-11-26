@@ -126,7 +126,7 @@ void print ( Arvore *root, int level ){
     }else{
         Lista* l = (Lista*) root->valorNo;
         Lista* aux;
-        printf("IMPRIMINDO LISTA\n");
+        printf("INICIO DA IMPRESSAO DA LISTA\n");
         for(aux = l; aux != NULL; aux = aux -> prox){
             switch(aux -> tipo){
                 case TIPO_ARVORE:{
@@ -134,10 +134,16 @@ void print ( Arvore *root, int level ){
                     imprimirArvoreComandos(ab);
                     break;
                 }
+                case TIPO_VARIAVEL:{
+                    Variavel* v = (Variavel*) aux->info;
+                    printf("%s\n", getNomeVariavel(v));
+                    break;
+                }
                 default:
                     printf("%s\n", (char*) aux->info);
                     break;
             }
+            printf("PROXIMO ElEMENTO \n");
         }
         printf("FIM DA IMPRESSAO DA LISTA\n");
     }

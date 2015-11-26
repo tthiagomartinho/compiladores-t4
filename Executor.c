@@ -274,24 +274,171 @@ void executarPara(Arvore* comandoAtual, Lista** hashVariavel, Lista** hashFuncao
 	int valorAte = atoi(getValorNo(ate));
 
 	int i;
+	imprimirArvoreComandos(para);
 	for(i = valorDe; i < valorAte; i = i + valorPasso){
-		exetuarPrograma(para->prox, hashVariavel, hashFuncao);
+		exetuarPrograma(para, hashVariavel, hashFuncao);
+	}
+}
+
+void executarSe(Arvore* comandoAtual, Lista** hashVariavel, Lista** hashFuncao){
+	Arvore* expressao = getFilhoEsquerda(comandoAtual);
+	Arvore* entao = getFilhoCentro(comandoAtual);
+	Arvore* senao = getFilhoDireita(comandoAtual);
+
+	int condicaoSe = avaliaExpressaoLogica (expressao, hashVariavel, hashFuncao);
+	if(condicaoSe == 1){
+		exetuarPrograma(entao, hashVariavel, hashFuncao);
+	} else {
+		exetuarPrograma(senao, hashVariavel, hashFuncao);
+	}
+}
+
+void executarMaisMais(Arvore* comandoAtual, Lista** hashVariavel){
+	Arvore* filhoEsquerda = getFilhoEsquerda(comandoAtual);
+	Arvore* filhoCentro = getFilhoCentro(comandoAtual);
+
+	if(filhoEsquerda != NULL){
+		Variavel* v = buscarVariavelTabelaHash(hashVariavel, getValorNo(filhoEsquerda), getEscopo(filhoEsquerda));
+
+		switch(getTipoVariavel(v)){
+			case TIPO_INTEIRO:{
+				int valor = *(int*)getValorVariavel(v);
+				valor++;
+				setVariavelValor(v, &valor, TIPO_INTEIRO);
+				break;
+			}
+			case TIPO_REAL:{
+				float valor = *(float*) getValorVariavel(v);
+				valor++;
+				setVariavelValor(v, &valor, TIPO_INTEIRO);
+				break;
+			}
+		}
+	} else {
+		Variavel* v = buscarVariavelTabelaHash(hashVariavel, getValorNo(filhoCentro), getEscopo(filhoCentro));
+		switch(getTipoVariavel(v)){
+			case TIPO_INTEIRO:{
+				int valor = *(int*)getValorVariavel(v);
+				++valor;
+				setVariavelValor(v, &valor, TIPO_INTEIRO);
+				break;
+			}
+			case TIPO_REAL:{
+				float valor = *(float*) getValorVariavel(v);
+				++valor;
+				setVariavelValor(v, &valor, TIPO_INTEIRO);
+				break;
+			}
+		}
+	}
+}
+
+void executarMenosMenos(Arvore* comandoAtual, Lista** hashVariavel){
+	Arvore* filhoEsquerda = getFilhoEsquerda(comandoAtual);
+	Arvore* filhoCentro = getFilhoCentro(comandoAtual);
+
+	if(filhoEsquerda != NULL){
+		Variavel* v = buscarVariavelTabelaHash(hashVariavel, getValorNo(filhoEsquerda), getEscopo(filhoEsquerda));
+		switch(getTipoVariavel(v)){
+			case TIPO_INTEIRO:{
+				int valor = *(int*)getValorVariavel(v);
+				valor--;
+				setVariavelValor(v, &valor, TIPO_INTEIRO);
+				break;
+			}
+			case TIPO_REAL:{
+				float valor = *(float*) getValorVariavel(v);
+				valor--;
+				setVariavelValor(v, &valor, TIPO_INTEIRO);
+				break;
+			}
+			default:
+			break;
+		}
+	} else {
+		Variavel* v = buscarVariavelTabelaHash(hashVariavel, getValorNo(filhoCentro), getEscopo(filhoCentro));
+		switch(getTipoVariavel(v)){
+			case TIPO_INTEIRO:{
+				int valor = *(int*)getValorVariavel(v);
+				--valor;
+				setVariavelValor(v, &valor, TIPO_INTEIRO);
+				break;
+			}
+			case TIPO_REAL:{
+				float valor = *(float*) getValorVariavel(v);
+				--valor;
+				setVariavelValor(v, &valor, TIPO_INTEIRO);
+				break;
+			}
+			default:
+			break;
+		}
+	}
+}
+
+void executarEnquanto(Arvore* comandoAtual, Lista** hashVariavel, Lista** hashFuncao){
+	Arvore* expressao = getFilhoEsquerda(comandoAtual);
+	Arvore* comandos = getFilhoCentro(comandoAtual);
+
+	int valorCondicao = avaliaExpressaoLogica (expressao, hashVariavel, hashFuncao);
+
+	while(valorCondicao == 1){
+		exetuarPrograma(comandos, hashVariavel, hashFuncao);
+		valorCondicao = avaliaExpressaoLogica (expressao, hashVariavel, hashFuncao);
+	}
+}
+
+void executarFacaEnquanto(Arvore* comandoAtual, Lista** hashVariavel, Lista** hashFuncao){
+	Arvore* expressao = getFilhoEsquerda(comandoAtual);
+	Arvore* comandos = getFilhoCentro(comandoAtual);
+
+	int valorCondicao = avaliaExpressaoLogica (expressao, hashVariavel, hashFuncao);
+
+	do{
+		exetuarPrograma(comandos, hashVariavel, hashFuncao);
+		valorCondicao = avaliaExpressaoLogica (expressao, hashVariavel, hashFuncao);
+	}while(valorCondicao == 1);
+}
+
+void executarAvalie(Arvore* comandoAtual, Lista** hashVariavel, Lista** hashFuncao){
+	Arvore* ident = getFilhoEsquerda(comandoAtual);
+	Arvore* casosArvore = getFilhoCentro(comandoAtual);
+	
+	Variavel* v = buscarVariavelTabelaHash(hashVariavel, getValorNo(ident), getEscopo(ident));
+	int valorVariavel = *(int*) getValorVariavel(v);
+
+	Lista* casos = (Lista*) getValorNo(casosArvore);
+	Lista* aux;
+	for(aux = casos; aux != NULL; aux = aux -> prox){
+		Arvore* caso = (Arvore*) aux->info;
+		Arvore* condicao = getFilhoEsquerda(caso);
+		int valorCondicao = atoi(getValorNo(condicao));
+		if(valorVariavel == valorCondicao){
+			exetuarPrograma(caso, hashVariavel, hashFuncao);
+			break;
+		}
+	}
+}
+
+void executarSeForFuncao(Arvore* comandoAtual, Lista** hashVariavel, Lista** hashFuncao){
+	Funcao* f = buscarFuncaoTabelaHash(hashFuncao, getValorNo(comandoAtual));
+	if(f == NULL){
+		return;
 	}
 
-	// printf("PARA %s DE %d ATE %d PASSO %d\n", getValorNo(variavel), valorDe, valorAte, valorPasso);
-
-
+	Arvore* parametrosPassados = getFilhoCentro(comandoAtual);
+	Arvore* filhoEsquerda = getFilhoEsquerda(comandoAtual);
+	Lista* variaveis = (Lista*) getValorNo(filhoEsquerda);
+	Lista* aux, *variaveisFuncao = NULL;
+	for(aux = variaveis; aux != NULL; aux = aux->prox){
+		
+	}
 }
 
 void exetuarPrograma(Arvore* programa, Lista** hashVariavel, Lista** hashFuncao){
-    if (programa == NULL) {
-      printf ("listaArvores está vazia!\n");
-      return;
-    }
-    Arvore* arvoreComandos = getFilhoEsquerda(programa);
     Arvore* comandoAtual;
     
-    for(comandoAtual = arvoreComandos; comandoAtual != NULL; comandoAtual = comandoAtual -> prox){
+    for(comandoAtual = programa; comandoAtual != NULL; comandoAtual = comandoAtual -> prox){
         char* comando = (char*) getValorNo(comandoAtual);
         if(strcmp(comando, "=") == 0){
             executarAtribuicao(comandoAtual, hashVariavel, hashFuncao);
@@ -299,69 +446,20 @@ void exetuarPrograma(Arvore* programa, Lista** hashVariavel, Lista** hashFuncao)
             executarImprima(comandoAtual, hashVariavel);
         } else if(strcmp(comando, "para") == 0){
             executarPara(comandoAtual, hashVariavel, hashFuncao);
-        } else if(strcmp(comando, "") == 0){
-            
-        } else if(strcmp(comando, "") == 0){
-            
-        } else if(strcmp(comando, "") == 0){
-            
-        } else if(strcmp(comando, "") == 0){
-            
-        } else if(strcmp(comando, "") == 0){
-            
-        } else if(strcmp(comando, "") == 0){
-            
-        } else if(strcmp(comando, "") == 0){
-            
-        }  {
-            
+        } else if(strcmp(comando, "se") == 0){
+            executarSe(comandoAtual, hashVariavel, hashFuncao);
+        } else if(strcmp(comando, "--") == 0){
+            executarMenosMenos(comandoAtual, hashVariavel);
+        } else if(strcmp(comando, "++") == 0){
+            executarMaisMais(comandoAtual, hashVariavel);
+        } else if(strcmp(comando, "enquanto") == 0){
+            executarEnquanto(comandoAtual, hashVariavel, hashFuncao);
+        } else if(strcmp(comando, "faca-enquanto") == 0){
+            executarFacaEnquanto(comandoAtual, hashVariavel, hashFuncao);
+        } else if(strcmp(comando, "avalie") == 0){
+            executarAvalie(comandoAtual, hashVariavel, hashFuncao);
+        } else{
+        	executarSeForFuncao(comandoAtual, hashVariavel, hashFuncao);
         }
-    
     }
-	
-//	while (listaArvores != NULL) {
-//		Arvore* a = listaArvores->info;
-		
-//		int tipo = getTipoNo(a);
-//		switch (tipo){
-//			case EXECUTOR_ATRIBUICAO:
-//				avaliaExpressaoAtribuicao (a, tabelaVariavel);
-//				break;
-		/*	case EXECUTOR_ENQUANTO:
-				//avaliaExpressaoEnquanto (a, tabelaVariavel);
-				break;
-			case EXECUTOR_PARA:
-				//avaliaExpressaoPara (a, tabelaVariavel);
-				break;
-			case EXECUTOR_IMPRIMA:
-				//avaliaExpressaoImprima (a, tabelaVariavel);
-				break;
-			case EXECUTOR_LEIA:
-				//avaliaExpressaoImprima (a, tabelaVariavel);
-				break;
-			case EXECUTOR_SE:
-				//avaliaExpressaoSe (a, tabelaVariavel);
-				break;
-			case EXECUTOR_FACA_ENQUANTO:
-				//avaliaExpressaoFacaEnquanto (a, tabelaVariavel);
-				break;
-			case EXECUTOR_AVALIE:
-				//avaliaExpressaoFacaEnquanto (a, tabelaVariavel);
-				break;
-			case EXECUTOR_RETORNO:
-				//avaliaExpressaoFacaEnquanto (a, tabelaVariavel);
-				break;				
-			case EXECUTOR_MAIS_MAIS_MENOS_MENOS:
-				//avaliaExpressaoFacaEnquanto (a, tabelaVariavel);
-				break;
-			case EXECUTOR_CHAMADA_FUNCAO:
-				//avaliaExpressaoFacaEnquanto (a, tabelaVariavel);
-				break;	*/
-	//		default:
-	//			break;
-//		}
-//		
-//		listaArvores = listaArvores->prox;
-//	}
-	
 }

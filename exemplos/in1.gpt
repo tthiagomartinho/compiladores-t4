@@ -11,116 +11,26 @@ variaveis
   l : logico;
 fim-variaveis
 
-funcao adicao (v1 : inteiro, v2 : inteiro) : inteiro
-  total : inteiro;
-  inicio
-    total = v1 + v2;
-    retorne (total);
-  fim
-fim-funcao
-
 inicio
- /* operacao = 15 + 10*10;
-  operacao = 15 + 10*5;
-  operacao++;
-  ++operacao;
-  imprima(operacao);
-  operacao = leia();
- 
-  se (operacao == 2) entao
-  	se (operacao == 2) entao
-  		se (operacao == 2) entao
-  			operacao = 2;
-  		senao 
-  			operacao = 3;
-  		fim-se
-  	senao 
-  		operacao = 3;
-  	fim-se
-  	operacao = 3;
-  	l = 5 == 5;
-  	l = 4 > 3;
-  	valor1 = 1.1 + 4.5;
-  senao 
-  	operacao = 3;
-  fim-se
-  l = 3 == 7;
-  operacao = 200 + 300;
- operacao = 15 + 10*10;
-  operacao = 15 + 10*5;
-  operacao++;
-  ++operacao;
-  imprima(operacao);
-  operacao = leia(); 
-*/
-  operacao = 0;
-  para operacao de 0 ate 10 passo 4 faca 
-    operacao = operacao + 10;
-    imprima(operacao);
-  fim-para
-
-/*
-
-  se (operacao == 2) entao
-  se (operacao == 2) entao
-  se (operacao == 2) entao
-        operacao = 2;
-      senao 
-        operacao = 3;
-      fim-se
-        operacao = 2;
-      senao 
-        operacao = 3;
-      fim-se
-  			operacao = 2;
-  		senao 
-  			operacao = 3;
-  		fim-se
-      */
-/*
-  enquanto operacao > 0 faca
-	operacao--;
-	imprima("Tempo restante ");
-	imprima(operacao);
-	fim-enquanto
-
-	operacao = 15 + 10*10;
-  operacao = 15 + 10*5;
-  operacao++;
-  ++operacao;
-*/
-
-  faca:
-		operacao--;
-		imprima("Tempo restante ");
-    	imprima(operacao);
-	enquanto (operacao > 3)
-	fim-enquanto
-/*
+  
+  operacao = 6;
 	avalie (operacao):
         caso 1:
-          operacao = operacao*2;
+          operacao = operacao + 1;
           pare;
         caso 2:
-          operacao = operacao*5;
+          operacao = operacao + 2;
           pare;
         caso 3:
-          operacao = operacao*6;
+          operacao = operacao + 3;
           pare;
         caso 4:
-          operacao = operacao*10;
+          operacao = operacao + 4;
           pare;
         caso 5:
-          operacao = operacao*7;
+          operacao = operacao + 5;
           pare;
       fim-avalie
-      */
 
-//		operacao = leia();
-     // imprima(operacao);
-     // imprima("\n");
- //    l = 4 < 3;
- //    imprima(l);
- //    l = 4.2 > 3.1;
- //    imprima(l);
+  imprima(operacao);
 fim

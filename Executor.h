@@ -29,4 +29,18 @@ void executarImprima(Arvore* comandoAtual, Lista** hashVariavel);
 
 void executarPara(Arvore* comandoAtual, Lista** hashVariavel, Lista** hashFuncao);
 
+void executarSe(Arvore* comandoAtual, Lista** hashVariavel, Lista** hashFuncao);
+
+void executarMaisMais(Arvore* comandoAtual, Lista** hashVariavel);
+
+void executarMenosMenos(Arvore* comandoAtual, Lista** hashVariavel);
+
+void executarEnquanto(Arvore* comandoAtual, Lista** hashVariavel, Lista** hashFuncao);
+
+void executarFacaEnquanto(Arvore* comandoAtual, Lista** hashVariavel, Lista** hashFuncao);
+
+void executarAvalie(Arvore* comandoAtual, Lista** hashVariavel, Lista** hashFuncao);
+
+void executarSeForFuncao(Arvore* comandoAtual, Lista** hashVariavel, Lista** hashFuncao);
+
 void exetuarPrograma(Arvore* programa, Lista** hashVariavel, Lista** hashFuncao);
