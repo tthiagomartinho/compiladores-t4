@@ -8,29 +8,44 @@ variaveis
   valor1, valor2 : real;
   res : inteiro;
   operacao : inteiro;
+  mat : matriz[10][10][10] de inteiro;
+  lit : literal;
   l : logico;
 fim-variaveis
 
+funcao adicao (v1 : inteiro, v2 : inteiro) : inteiro
+  total : inteiro;
+  inicio
+    total = v1 + v2;
+    retorne total;
+  fim
+fim-funcao
+
+funcao adicao2 (v1 : inteiro, v2 : inteiro) : inteiro
+  total : inteiro;
+  inicio
+    total = v1 + v2;
+    retorne (total);
+  fim
+fim-funcao
+
+funcao aleatoria () : literal
+  total : inteiro;
+  inicio
+    retorne "total";
+  fim
+fim-funcao
+
 inicio
   
-  operacao = 6;
-	avalie (operacao):
-        caso 1:
-          operacao = operacao + 1;
-          pare;
-        caso 2:
-          operacao = operacao + 2;
-          pare;
-        caso 3:
-          operacao = operacao + 3;
-          pare;
-        caso 4:
-          operacao = operacao + 4;
-          pare;
-        caso 5:
-          operacao = operacao + 5;
-          pare;
-      fim-avalie
+  //lit = leia();
+//  operacao = 5;
+ // operacao = adicao(1, 2);
 
-  imprima(operacao);
+  operacao = central(4, 5, 1);
+
+  //lit = aleatoria();
+
+ // imprima(operacao);
+ // imprima(lit);
 fim

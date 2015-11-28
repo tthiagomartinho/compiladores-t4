@@ -134,7 +134,31 @@ int getTipoExpressaoLogica(Arvore* a, Lista** hashVariavel, Lista** hashFuncao){
 	}
 }
 
-void executarAtribuicao(Arvore* comandoAtual, Lista** hashVariavel, Lista** hashFuncao) {
+int getPosicaoMatriz(Lista* dimensoesMatriz, Variavel* variavel){
+	if(tamanhoLista(dimensoesMatriz) == 1){
+		return atoi(dimensoesMatriz->info);
+	}
+
+	Lista* aux;
+	int tam = getDimensaoMatriz(variavel);
+	int* dimensoes = getDimensoes(variavel);
+	int pos = 1;
+
+	int totalIndice = 0;
+
+	for(aux = dimensoesMatriz; aux != NULL; aux = aux->prox){
+		int indice = atoi(aux->info);
+		int t;
+		for(t = pos; t < tam; t++){
+			indice = indice * dimensoes[t];
+		}
+		pos++;
+		totalIndice += indice;
+	}
+	return totalIndice;
+}
+
+void executarAtribuicao(Arvore* comandoAtual, Arvore* funcoes, Lista** hashVariavel, Lista** hashFuncao) {
 	int funcao = 0;
 	Arvore* variavelASerAtribuida = getFilhoEsquerda(comandoAtual);
 	Arvore* comandoASerExecutado = getFilhoCentro(comandoAtual);
@@ -143,6 +167,12 @@ void executarAtribuicao(Arvore* comandoAtual, Lista** hashVariavel, Lista** hash
 	Variavel* variavel = buscarVariavelTabelaHash(hashVariavel, getValorNo(variavelASerAtribuida), getEscopo(variavelASerAtribuida));
 	int tipoVariavel = getTipoVariavel(variavel);
 
+	int posicao = 0;
+
+	if(variavelASerAtribuida->dimensoesMatriz != NULL){
+		posicao = getPosicaoMatriz(variavelASerAtribuida->dimensoesMatriz, variavel);
+	}
+
 	if(comandoASerExecutado->tipo == TIPO_FUNCAO){
 		funcao = 1;
 	} else if(strcmp(comandoASerExecutado->valorNo, "leia") == 0){
@@ -150,69 +180,62 @@ void executarAtribuicao(Arvore* comandoAtual, Lista** hashVariavel, Lista** hash
 		return;
 	}
 
-	switch (tipoVariavel) {
-		case TIPO_INTEIRO:{
-			int valor;
-			if(funcao == 1){
-				//valor = executarFuncao();
-			}else{
-				valor = avaliaExpressaoInteiro (comandoASerExecutado, hashVariavel, hashFuncao);
+	if(funcao == 1){
+		executarSeForFuncao(comandoASerExecutado, funcoes, hashVariavel, hashFuncao, variavel, posicao);
+	}else{
+		switch (tipoVariavel) {
+			case TIPO_INTEIRO:{
+				int valor = avaliaExpressaoInteiro (comandoASerExecutado, hashVariavel, hashFuncao);
+				setVariavelValor(variavel, &valor, TIPO_INTEIRO, posicao);
+				break;
+			}case TIPO_REAL:{
+				float valor = avaliaExpressaoReal (comandoASerExecutado, hashVariavel, hashFuncao);
+				setVariavelValor(variavel, &valor, TIPO_REAL, posicao);
+				break;
+			}case TIPO_LOGICO:{
+				int valor = avaliaExpressaoLogica (comandoASerExecutado, hashVariavel, hashFuncao);
+				setVariavelValor(variavel, &valor, TIPO_INTEIRO, posicao);
+				break;
+			}case TIPO_LITERAL:{
+				char* valor = getValorNo(comandoASerExecutado);
+				setVariavelValor(variavel, &valor, TIPO_LITERAL, posicao);
+				break;
 			}
-			setVariavelValor(variavel, &valor, TIPO_INTEIRO);
-			break;
-		}case TIPO_REAL:{
-			float valor;
-			if(funcao == 1){
-				//valor = executarFuncao();
-			}else{
-				valor = avaliaExpressaoReal (comandoASerExecutado, hashVariavel, hashFuncao);
-			}
-			setVariavelValor(variavel, &valor, TIPO_REAL);
-			break;
-		}case TIPO_LOGICO:{
-			int valor;
-			if(funcao == 1){
-				//valor = executarFuncao();
-			}else{
-				valor = avaliaExpressaoLogica (comandoASerExecutado, hashVariavel, hashFuncao);
-			}
-			setVariavelValor(variavel, &valor, TIPO_INTEIRO);
-			break;
-		}default:
-			break;
+		}
 	}
 }
 
 void executarLeia(Variavel* variavel){
+	int posicao = 0;
 	switch(getTipoVariavel(variavel)){
 		case TIPO_INTEIRO:{
 			int valor;
 			scanf(" %d", &valor);
-			setVariavelValor(variavel, &valor, TIPO_INTEIRO);
+			setVariavelValor(variavel, &valor, TIPO_INTEIRO, posicao);
 			break;
 		}
 		case TIPO_LOGICO:{
 			int valor;
 			scanf(" %d", &valor);
-			setVariavelValor(variavel, &valor, TIPO_LOGICO);
+			setVariavelValor(variavel, &valor, TIPO_LOGICO, posicao);
 			break;
 		}
 		case TIPO_REAL: {
 			float valor;
 			scanf(" %f", &valor);
-			setVariavelValor(variavel, &valor, TIPO_REAL);
+			setVariavelValor(variavel, &valor, TIPO_REAL, posicao);
 			break;
 		}
 		case TIPO_LITERAL: {
 			char valor[255];
     		fgets(valor, sizeof valor, stdin);
-			setVariavelValor(variavel, valor, TIPO_LITERAL);
+			setVariavelValor(variavel, valor, TIPO_LITERAL, posicao);
 			break;
 		}
 		case TIPO_CARACTERE: {
 			char valor[255];
     		fgets(valor, sizeof valor, stdin);
-			setVariavelValor(variavel, valor, TIPO_LITERAL);
+			setVariavelValor(variavel, valor, TIPO_LITERAL, posicao);
 			break;
 		}
 		default:
@@ -249,7 +272,7 @@ void executarImprima(Arvore* comandoAtual, Lista** hashVariavel){
 	}
 }
 
-void executarPara(Arvore* comandoAtual, Lista** hashVariavel, Lista** hashFuncao){
+void executarPara(Arvore* comandoAtual, Arvore* funcoes, Lista** hashVariavel, Lista** hashFuncao){
 	Arvore* limitadores = getFilhoEsquerda(comandoAtual);
 	Arvore* para = getFilhoCentro(comandoAtual);
 	Lista* operador = (Lista*) getValorNo(limitadores);
@@ -274,43 +297,43 @@ void executarPara(Arvore* comandoAtual, Lista** hashVariavel, Lista** hashFuncao
 	int valorAte = atoi(getValorNo(ate));
 
 	int i;
-	imprimirArvoreComandos(para);
+
 	for(i = valorDe; i < valorAte; i = i + valorPasso){
-		exetuarPrograma(para, hashVariavel, hashFuncao);
+		exetuarPrograma(para, funcoes, hashVariavel, hashFuncao);
 	}
 }
 
-void executarSe(Arvore* comandoAtual, Lista** hashVariavel, Lista** hashFuncao){
+void executarSe(Arvore* comandoAtual, Arvore* funcoes, Lista** hashVariavel, Lista** hashFuncao){
 	Arvore* expressao = getFilhoEsquerda(comandoAtual);
 	Arvore* entao = getFilhoCentro(comandoAtual);
 	Arvore* senao = getFilhoDireita(comandoAtual);
 
 	int condicaoSe = avaliaExpressaoLogica (expressao, hashVariavel, hashFuncao);
 	if(condicaoSe == 1){
-		exetuarPrograma(entao, hashVariavel, hashFuncao);
+		exetuarPrograma(entao, funcoes, hashVariavel, hashFuncao);
 	} else {
-		exetuarPrograma(senao, hashVariavel, hashFuncao);
+		exetuarPrograma(senao, funcoes, hashVariavel, hashFuncao);
 	}
 }
 
 void executarMaisMais(Arvore* comandoAtual, Lista** hashVariavel){
 	Arvore* filhoEsquerda = getFilhoEsquerda(comandoAtual);
 	Arvore* filhoCentro = getFilhoCentro(comandoAtual);
-
+	int posicao = 0;
 	if(filhoEsquerda != NULL){
 		Variavel* v = buscarVariavelTabelaHash(hashVariavel, getValorNo(filhoEsquerda), getEscopo(filhoEsquerda));
-
+		
 		switch(getTipoVariavel(v)){
 			case TIPO_INTEIRO:{
 				int valor = *(int*)getValorVariavel(v);
 				valor++;
-				setVariavelValor(v, &valor, TIPO_INTEIRO);
+				setVariavelValor(v, &valor, TIPO_INTEIRO, posicao);
 				break;
 			}
 			case TIPO_REAL:{
 				float valor = *(float*) getValorVariavel(v);
 				valor++;
-				setVariavelValor(v, &valor, TIPO_INTEIRO);
+				setVariavelValor(v, &valor, TIPO_INTEIRO, posicao);
 				break;
 			}
 		}
@@ -320,13 +343,13 @@ void executarMaisMais(Arvore* comandoAtual, Lista** hashVariavel){
 			case TIPO_INTEIRO:{
 				int valor = *(int*)getValorVariavel(v);
 				++valor;
-				setVariavelValor(v, &valor, TIPO_INTEIRO);
+				setVariavelValor(v, &valor, TIPO_INTEIRO, posicao);
 				break;
 			}
 			case TIPO_REAL:{
 				float valor = *(float*) getValorVariavel(v);
 				++valor;
-				setVariavelValor(v, &valor, TIPO_INTEIRO);
+				setVariavelValor(v, &valor, TIPO_INTEIRO, posicao);
 				break;
 			}
 		}
@@ -336,20 +359,21 @@ void executarMaisMais(Arvore* comandoAtual, Lista** hashVariavel){
 void executarMenosMenos(Arvore* comandoAtual, Lista** hashVariavel){
 	Arvore* filhoEsquerda = getFilhoEsquerda(comandoAtual);
 	Arvore* filhoCentro = getFilhoCentro(comandoAtual);
-
+	int posicao = 0;
 	if(filhoEsquerda != NULL){
 		Variavel* v = buscarVariavelTabelaHash(hashVariavel, getValorNo(filhoEsquerda), getEscopo(filhoEsquerda));
+		
 		switch(getTipoVariavel(v)){
 			case TIPO_INTEIRO:{
 				int valor = *(int*)getValorVariavel(v);
 				valor--;
-				setVariavelValor(v, &valor, TIPO_INTEIRO);
+				setVariavelValor(v, &valor, TIPO_INTEIRO, posicao);
 				break;
 			}
 			case TIPO_REAL:{
 				float valor = *(float*) getValorVariavel(v);
 				valor--;
-				setVariavelValor(v, &valor, TIPO_INTEIRO);
+				setVariavelValor(v, &valor, TIPO_INTEIRO, posicao);
 				break;
 			}
 			default:
@@ -361,13 +385,13 @@ void executarMenosMenos(Arvore* comandoAtual, Lista** hashVariavel){
 			case TIPO_INTEIRO:{
 				int valor = *(int*)getValorVariavel(v);
 				--valor;
-				setVariavelValor(v, &valor, TIPO_INTEIRO);
+				setVariavelValor(v, &valor, TIPO_INTEIRO, posicao);
 				break;
 			}
 			case TIPO_REAL:{
 				float valor = *(float*) getValorVariavel(v);
 				--valor;
-				setVariavelValor(v, &valor, TIPO_INTEIRO);
+				setVariavelValor(v, &valor, TIPO_INTEIRO, posicao);
 				break;
 			}
 			default:
@@ -376,31 +400,31 @@ void executarMenosMenos(Arvore* comandoAtual, Lista** hashVariavel){
 	}
 }
 
-void executarEnquanto(Arvore* comandoAtual, Lista** hashVariavel, Lista** hashFuncao){
+void executarEnquanto(Arvore* comandoAtual, Arvore* funcoes, Lista** hashVariavel, Lista** hashFuncao){
 	Arvore* expressao = getFilhoEsquerda(comandoAtual);
 	Arvore* comandos = getFilhoCentro(comandoAtual);
 
 	int valorCondicao = avaliaExpressaoLogica (expressao, hashVariavel, hashFuncao);
 
 	while(valorCondicao == 1){
-		exetuarPrograma(comandos, hashVariavel, hashFuncao);
+		exetuarPrograma(comandos, funcoes, hashVariavel, hashFuncao);
 		valorCondicao = avaliaExpressaoLogica (expressao, hashVariavel, hashFuncao);
 	}
 }
 
-void executarFacaEnquanto(Arvore* comandoAtual, Lista** hashVariavel, Lista** hashFuncao){
+void executarFacaEnquanto(Arvore* comandoAtual, Arvore* funcoes, Lista** hashVariavel, Lista** hashFuncao){
 	Arvore* expressao = getFilhoEsquerda(comandoAtual);
 	Arvore* comandos = getFilhoCentro(comandoAtual);
 
 	int valorCondicao = avaliaExpressaoLogica (expressao, hashVariavel, hashFuncao);
 
 	do{
-		exetuarPrograma(comandos, hashVariavel, hashFuncao);
+		exetuarPrograma(comandos, funcoes, hashVariavel, hashFuncao);
 		valorCondicao = avaliaExpressaoLogica (expressao, hashVariavel, hashFuncao);
 	}while(valorCondicao == 1);
 }
 
-void executarAvalie(Arvore* comandoAtual, Lista** hashVariavel, Lista** hashFuncao){
+void executarAvalie(Arvore* comandoAtual, Arvore* funcoes, Lista** hashVariavel, Lista** hashFuncao){
 	Arvore* ident = getFilhoEsquerda(comandoAtual);
 	Arvore* casosArvore = getFilhoCentro(comandoAtual);
 	
@@ -414,52 +438,225 @@ void executarAvalie(Arvore* comandoAtual, Lista** hashVariavel, Lista** hashFunc
 		Arvore* condicao = getFilhoEsquerda(caso);
 		int valorCondicao = atoi(getValorNo(condicao));
 		if(valorVariavel == valorCondicao){
-			exetuarPrograma(caso, hashVariavel, hashFuncao);
+			exetuarPrograma(caso, funcoes, hashVariavel, hashFuncao);
 			break;
 		}
 	}
 }
 
-void executarSeForFuncao(Arvore* comandoAtual, Lista** hashVariavel, Lista** hashFuncao){
+void executarSeForFuncao(Arvore* comandoAtual, Arvore* funcoes, Lista** hashVariavel, Lista** hashFuncao, Variavel* variavel, int posicao){
+	Arvore* aux, *arvoreFuncao = NULL;
 	Funcao* f = buscarFuncaoTabelaHash(hashFuncao, getValorNo(comandoAtual));
 	if(f == NULL){
 		return;
 	}
 
+	//procura nas funcoes presentes no codigo
+	for(aux = funcoes; aux != NULL; aux = aux->prox){
+		if(strcmp(getValorNo(aux), getValorNo(comandoAtual)) == 0){
+			arvoreFuncao = aux;
+			break;
+		}
+	}
+
 	Arvore* parametrosPassados = getFilhoCentro(comandoAtual);
-	Arvore* filhoEsquerda = getFilhoEsquerda(comandoAtual);
-	Lista* variaveis = (Lista*) getValorNo(filhoEsquerda);
-	Lista* aux, *variaveisFuncao = NULL;
-	for(aux = variaveis; aux != NULL; aux = aux->prox){
-		
+	if(arvoreFuncao != NULL){
+		Arvore* param = getFilhoEsquerda(arvoreFuncao);
+		Lista* parametrosFuncao = (Lista*) getValorNo(param);
+
+		 if(parametrosFuncao != NULL){
+			// //inicia as variaveis
+			for(aux = parametrosPassados; aux != NULL; aux = aux->prox, parametrosFuncao = parametrosFuncao->prox){
+				Variavel* vAux = (Variavel*) parametrosFuncao->info;
+				Variavel* vFuncao = buscarVariavelTabelaHash(hashVariavel, getNomeVariavel(vAux), getNomeFuncao(f));
+
+				int posicao = 0;
+				switch(getTipoNo(aux)){
+					case TIPO_VARIAVEL:{
+						Variavel* v = buscarVariavelTabelaHash(hashVariavel, getValorNo(aux), getEscopo(aux));
+						setVariavelValor (vFuncao, getValorVariavel(v), getTipoVariavel(v), posicao);
+						break;
+					}
+					case TIPO_REAL:{
+						float valor = atof(getValorNo(aux));
+						setVariavelValor (vFuncao, &valor, TIPO_REAL, posicao);
+						break;
+					}case TIPO_INTEIRO:{
+						int valor = atoi(getValorNo(aux));
+						setVariavelValor (vFuncao, &valor, TIPO_INTEIRO, posicao);
+						break;
+					}case TIPO_LITERAL:{
+						char* valor = (char*) getValorNo(aux);
+						setVariavelValor (vFuncao, valor, TIPO_LITERAL, posicao);
+						break;
+					}case TIPO_LOGICO:{
+						int valor = atoi(getValorNo(aux));
+						setVariavelValor (vFuncao, &valor, TIPO_INTEIRO, posicao);
+						break;
+					}
+				}
+			}
+		}
+	}
+
+	char* nomeFuncao = getNomeFuncao(f);
+
+	if(strcmp(nomeFuncao, "minimo") == 0){
+		executarMinimo(hashVariavel, parametrosPassados, variavel, posicao);
+	} else if(strcmp(nomeFuncao, "maximo") == 0) {
+		executarMaximo(hashVariavel, parametrosPassados, variavel, posicao);
+	} else if(strcmp(nomeFuncao, "central") == 0){
+		executarCentral(hashVariavel, parametrosPassados, variavel, posicao);
+	} else{
+		exetuarPrograma1(getFilhoCentro(arvoreFuncao), funcoes, hashVariavel, hashFuncao, 1, variavel, posicao);
 	}
 }
 
-void exetuarPrograma(Arvore* programa, Lista** hashVariavel, Lista** hashFuncao){
+void executarRetorne(Arvore* comandoAtual, Arvore* funcoes, Lista** hashVariavel, Lista** hashFuncao, Variavel* variavel, int posicao){
+	int tipoExpressao = getTipoNo(comandoAtual);
+	Arvore* comandoASerExecutado = getFilhoEsquerda(comandoAtual);
+	if(comandoASerExecutado == NULL || variavel == NULL){
+		return;
+	}
+	switch (tipoExpressao) {
+		case TIPO_INTEIRO:{
+			int valor = avaliaExpressaoInteiro (comandoASerExecutado, hashVariavel, hashFuncao);
+			setVariavelValor(variavel, &valor, TIPO_INTEIRO, posicao);
+			break;
+		}case TIPO_REAL:{
+			float valor = avaliaExpressaoReal (comandoASerExecutado, hashVariavel, hashFuncao);
+			setVariavelValor(variavel, &valor, TIPO_REAL, posicao);
+			break;
+		}case TIPO_LOGICO:{
+			int valor = avaliaExpressaoLogica (comandoASerExecutado, hashVariavel, hashFuncao);
+			setVariavelValor(variavel, &valor, TIPO_LOGICO, posicao);
+			break;
+		}case TIPO_LITERAL:{
+			char* valor = getValorNo(comandoASerExecutado);
+			setVariavelValor(variavel, &valor, TIPO_LITERAL, posicao);
+			break;
+		}case TIPO_CARACTERE:{
+			char* valor = getValorNo(comandoASerExecutado);
+			setVariavelValor(variavel, &valor, TIPO_LITERAL, posicao);
+			break;
+		}
+	}
+}
+
+void executarMaximo(Lista** hashVariavel, Arvore* parametrosPassados, Variavel* variavel, int posicao){
+	Arvore* aux;
+	int maximo = -999999;
+	for(aux = parametrosPassados; aux != NULL; aux = aux->prox){
+		switch(getTipoNo(aux)){
+			case TIPO_VARIAVEL:{
+				Variavel* v = buscarVariavelTabelaHash(hashVariavel, getValorNo(aux), getEscopo(aux));
+				int valorVariavel = atoi(getValorVariavel(v));
+				if(maximo < valorVariavel){
+					maximo = valorVariavel;
+				}
+				break;
+			}
+			case TIPO_INTEIRO:{
+				int valor = atoi(getValorNo(aux));
+				if(maximo < valor){
+					maximo = valor;
+				}
+				break;
+			}
+		}
+	}
+
+	setVariavelValor (variavel, &maximo, getTipoVariavel(variavel), posicao);
+}
+
+void executarMinimo(Lista** hashVariavel, Arvore* parametrosPassados, Variavel* variavel, int posicao){
+	Arvore* aux;
+	int minimo = 999999;
+	for(aux = parametrosPassados; aux != NULL; aux = aux->prox){
+		switch(getTipoNo(aux)){
+			case TIPO_VARIAVEL:{
+				Variavel* v = buscarVariavelTabelaHash(hashVariavel, getValorNo(aux), getEscopo(aux));
+				int valorVariavel = atoi(getValorVariavel(v));
+				if(minimo > valorVariavel){
+					minimo = valorVariavel;
+				}
+				break;
+			}
+			case TIPO_INTEIRO:{
+				int valor = atoi(getValorNo(aux));
+				if(minimo > valor){
+					minimo = valor;
+				}
+				break;
+			}
+		}
+	}
+
+	setVariavelValor (variavel, &minimo, getTipoVariavel(variavel), posicao);
+}
+
+int cmpfunc (const void * a, const void * b){
+   return ( *(int*)a - *(int*)b );
+}
+
+void executarCentral(Lista** hashVariavel, Arvore* parametrosPassados, Variavel* variavel, int posicao){
+	Arvore* aux;
+	int numeros[3];
+	int i = 0;
+	for(aux = parametrosPassados; aux != NULL; aux = aux->prox){
+		switch(getTipoNo(aux)){
+			case TIPO_VARIAVEL:{
+				Variavel* v = buscarVariavelTabelaHash(hashVariavel, getValorNo(aux), getEscopo(aux));
+				int valorVariavel = atoi(getValorVariavel(v));
+				numeros[i] = valorVariavel;
+				i++;
+				break;
+			}
+			case TIPO_INTEIRO:{
+				int valor = atoi(getValorNo(aux));
+				numeros[i] = valor;
+				i++;
+				break;
+			}
+		}
+	}
+	qsort(numeros, 3, sizeof(int), cmpfunc);
+
+
+	setVariavelValor (variavel, &numeros[1], getTipoVariavel(variavel), posicao);
+}
+
+void exetuarPrograma(Arvore* programa, Arvore* funcoes, Lista** hashVariavel, Lista** hashFuncao){
+    exetuarPrograma1(programa, funcoes, hashVariavel, hashFuncao, 0, NULL, 0);
+}
+
+void exetuarPrograma1(Arvore* programa, Arvore* funcoes, Lista** hashVariavel, Lista** hashFuncao, int executarFuncao, Variavel* v, int posicao){
     Arvore* comandoAtual;
-    
+
     for(comandoAtual = programa; comandoAtual != NULL; comandoAtual = comandoAtual -> prox){
         char* comando = (char*) getValorNo(comandoAtual);
         if(strcmp(comando, "=") == 0){
-            executarAtribuicao(comandoAtual, hashVariavel, hashFuncao);
+            executarAtribuicao(comandoAtual, funcoes, hashVariavel, hashFuncao);
         } else if(strcmp(comando, "imprima") == 0){
             executarImprima(comandoAtual, hashVariavel);
         } else if(strcmp(comando, "para") == 0){
-            executarPara(comandoAtual, hashVariavel, hashFuncao);
+            executarPara(comandoAtual, funcoes, hashVariavel, hashFuncao);
         } else if(strcmp(comando, "se") == 0){
-            executarSe(comandoAtual, hashVariavel, hashFuncao);
+            executarSe(comandoAtual, funcoes, hashVariavel, hashFuncao);
         } else if(strcmp(comando, "--") == 0){
             executarMenosMenos(comandoAtual, hashVariavel);
         } else if(strcmp(comando, "++") == 0){
             executarMaisMais(comandoAtual, hashVariavel);
         } else if(strcmp(comando, "enquanto") == 0){
-            executarEnquanto(comandoAtual, hashVariavel, hashFuncao);
+            executarEnquanto(comandoAtual, funcoes, hashVariavel, hashFuncao);
         } else if(strcmp(comando, "faca-enquanto") == 0){
-            executarFacaEnquanto(comandoAtual, hashVariavel, hashFuncao);
+            executarFacaEnquanto(comandoAtual, funcoes, hashVariavel, hashFuncao);
         } else if(strcmp(comando, "avalie") == 0){
-            executarAvalie(comandoAtual, hashVariavel, hashFuncao);
+            executarAvalie(comandoAtual, funcoes, hashVariavel, hashFuncao);
+        } else if(strcmp(comando, "retorno") == 0){
+            executarRetorne(comandoAtual, funcoes, hashVariavel, hashFuncao, v, posicao);
         } else{
-        	executarSeForFuncao(comandoAtual, hashVariavel, hashFuncao);
+        	executarSeForFuncao(comandoAtual, funcoes, hashVariavel, hashFuncao, v, posicao);
         }
     }
 }

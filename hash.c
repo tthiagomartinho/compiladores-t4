@@ -224,22 +224,34 @@ void* getValorVariavel(Variavel* v){
     return v->valor;
 }
 
+int getDimensaoMatriz(Variavel* v){
+    return v->dimensaoMatriz;
+}
+
+int* getDimensoes(Variavel* v){
+    return v->dimensoes;
+}
+
 void setValorInteiro(Variavel* v, int valor){
     memcpy(v->valor, &valor, sizeof(int));
 }
 
 // setar valor da variável de acordo com o seu tipo
-void setVariavelValor (Variavel* v, void* valor, int tipo) {
-	int valorInteiro = 0;
-	float valorReal = 0.0;
-	int valorLogico = 0;
-
+void setVariavelValor (Variavel* v, void* valor, int tipo, int posicaoMatriz) {
 	switch (tipo) {
 		case TIPO_INTEIRO:
-			memcpy(v->valor, (int*) valor, sizeof(int));
+            if(posicaoMatriz == 0){
+                memcpy(v->valor, (int*) valor, sizeof(int));
+            }else{
+                // memcpy(v->valor[posicaoMatriz], (int*) valor, sizeof(int));
+            }
 			return;
 		case TIPO_REAL:
-            memcpy(v->valor, (float*) valor, sizeof(float));
+            if(posicaoMatriz == 0){
+                memcpy(v->valor, (float*) valor, sizeof(float));
+            }else{
+                // memcpy(v->valor[posicaoMatriz], (float*) valor, sizeof(float));
+            }
 			return;
         case TIPO_CARACTERE:
             strcpy(v->valor, valor);
@@ -248,23 +260,12 @@ void setVariavelValor (Variavel* v, void* valor, int tipo) {
             strcpy(v->valor, valor);
             return;
 		case TIPO_LOGICO:
-			memcpy(v->valor, (int*) valor, sizeof(int));
-            //valorLogico = *((int* ) valor);
-			/*
-			 * Se valorLogico > 0 setar o valor da variável para 1
-			 * Se valorLogico = 0 setar o valor da variável para 0
-			 * Se valorLogico < 0 retornar erro
-			 */
-			if (valorLogico > 0) {
-			//	v->valor = 1;
-			} else if (valorLogico == 0) {
-			//	v->valor = 0;
-			} else {
-				printf ("Valor Lógico menor que zero!\n");
-				exit(1);
-			}
-
-			return;
+			if(posicaoMatriz == 0){
+                memcpy(v->valor, (int*) valor, sizeof(int));
+            }else{
+          //      memcpy(v->valor[posicaoMatriz], (int*) valor, sizeof(int));
+            }
+            break;
 	}
 }
 
@@ -588,10 +589,10 @@ int validarAcessoMatriz(Variavel* v, Lista* dimensoesMatriz){
 }
 
 Lista* copiarListaChar(Lista* lista){
-    Lista* l = inicializarLista();
+    Lista* l = NULL;
     Lista* k;
     for (k = lista; k != NULL; k = k -> prox) {
-        l = criarNovoNoLista(TIPO_LITERAL, k->info, l);
+        l = criarNovoNoListaFim(TIPO_LITERAL, k->info, l);
     }
     return l;
 }

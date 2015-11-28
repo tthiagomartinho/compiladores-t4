@@ -62,6 +62,10 @@ char* getNomeVariavel(Variavel* v);
 
 char* getEscopoVariavel(Variavel* v);
 
+int getDimensaoMatriz(Variavel* v);
+
+int* getDimensoes(Variavel* v);
+
 /**************************MANIPULACAO TABELA HASH DE VARIAVEIS*****************/
 
 Lista** inserirVariavelTabelaHash(Lista** tabelaHash, Variavel* v, Lista* dimensoesMatriz, int tipo, char* escopo);
@@ -77,7 +81,7 @@ void* getValorVariavel(Variavel* v);
 void setValorInteiro(Variavel* v, int valor);
 
 // seta o valor da variavel de acordo com o tipo passado
-void setVariavelValor (Variavel* v, void* valor, int tipo);
+void setVariavelValor (Variavel* v, void* valor, int tipo, int posicaoMatriz);
 
 /**************************MANIPULACAO DE FUNCOES******************************/
 Funcao* criarFuncao(char* nome);

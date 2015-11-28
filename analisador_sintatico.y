@@ -336,7 +336,7 @@ COMANDO_RETORNO
         tipoExpressaoAtribuicao = tipoRetornoFuncao;
     } EXPRESSAO {
         validarExpressaoSairCasoInvalido();
-        Arvore* retorno = inicializaArvore(TIPO_LITERAL, "retorno", NULL, NULL);
+        Arvore* retorno = inicializaArvore(tipoExpressaoAtribuicao, "retorno", NULL, NULL);
         Arvore* ArvExp = getArvoreTopoPilha(p);
         p = desempilhar(p);
         retorno = setFilhosEsquerdaCentroDireita(retorno, ArvExp, NULL, NULL);
@@ -476,14 +476,22 @@ COMANDO_ATRIBUICAO
         arvoreComandoAtual = setFilhosEsquerdaCentroDireita(arvoreComandoAtual, novoNo, NULL, NULL);
     } 
     token_operadorAtribuicao COMANDO_ATRIBUICAO2
-    | token_identificador POSICAO_MATRIZ{
-        Variavel* v = validarIdentificadorSairCasoInvalido();
-        validarAcessoMatrizSairCasoInvalido(v);
-        dimensoesMatriz = liberarMemoriaLista(dimensoesMatriz);
-        tipoExpressaoAtribuicao = getTipoVariavel(v);    
-        Lista* copiaDimensoes = copiarListaChar(dimensoesMatriz);
-        Arvore* novoNo = inicializaArvore(TIPO_VARIAVEL, getNomeVariavel(v), getEscopoVariavel(v), copiaDimensoes);
+    | ACESSO_MATRIZ {
+        // Variavel* v = validarIdentificadorSairCasoInvalido();
+        // validarAcessoMatrizSairCasoInvalido(v);
+        // dimensoesMatriz = liberarMemoriaLista(dimensoesMatriz);
+        // tipoExpressaoAtribuicao = getTipoVariavel(v);    
+        // Lista* aux;
+        // Lista* copiaDimensoes = copiarListaChar(dimensoesMatriz);
+        // for(aux = dimensoesMatriz; aux != NULL; aux = aux->prox){
+        //     printf("%s\n", (char*) aux->info);
+        // }
+        // Arvore* novoNo = inicializaArvore(TIPO_VARIAVEL, getNomeVariavel(v), getEscopoVariavel(v), copiaDimensoes);
         arvoreComandoAtual = inicializaArvore(TIPO_LITERAL, "=", NULL, NULL);
+        Arvore* novoNo = getArvoreTopoPilha(p);
+        p = desempilhar(p);
+        p = NULL;
+        expressao = NULL;
         arvoreComandoAtual = setFilhosEsquerdaCentroDireita(arvoreComandoAtual, novoNo, NULL, NULL);
     } 
     token_operadorAtribuicao COMANDO_ATRIBUICAO2
@@ -540,13 +548,13 @@ COMANDO_ENQUANTO
         Arvore* ArvExp = getArvoreTopoPilha(p);
         p = desempilhar(p);
         p = NULL;
+
         Arvore* enquanto = inicializaArvore(TIPO_LITERAL, "enquanto", NULL, NULL);
         Arvore* faca = inicializaArvore(TIPO_LITERAL, "faca", NULL, NULL);
         enquanto = setFilhosEsquerdaCentroDireita(enquanto, ArvExp, faca, NULL);
         pilhaNiveis = empilhar(pilhaNiveis, enquanto);
         pilhaNiveis = empilhar(pilhaNiveis, faca);
         //pilhaNiveis = empilhar(pilhaNiveis, NULL);
-
 
     } token_faca LISTA_COMANDOS {
         Arvore* faca = getArvoreTopoPilha(pilhaNiveis);
@@ -573,6 +581,7 @@ COMANDO_PARA
 
         Arvore* ArvExp = getArvoreTopoPilha(p);
         p = desempilhar(p);
+
         comandosRepeticao = criarNovoNoListaFim(TIPO_ARVORE, ArvExp, comandosRepeticao);
     } token_ate EXPRESSAO {
         tipoExpressaoAtribuicao = TIPO_INTEIRO;
@@ -616,6 +625,7 @@ COMANDO_PARA2
        // pilhaNiveis = empilhar(pilhaNiveis, NULL);
         comandosRepeticao = NULL;
         p = NULL;
+        expressao = NULL;
 
     } token_faca LISTA_COMANDOS {
         Arvore* faca = getArvoreTopoPilha(pilhaNiveis);
@@ -808,10 +818,6 @@ COMANDO_IMPRIMA
         parametrosFuncao = criarNovoNoListaFim(tipo, yytext, parametrosFuncao);
      }
      ;
-// PARAMETROS_FUNCAO
-//     : PARAMETROS_FUNCAO token_simboloVirgula POSSIVEIS_PARAMETROS 
-//     | POSSIVEIS_PARAMETROS
-//     ;
 
 POSSIVEIS_PARAMETROS
     : FATOR {
@@ -821,26 +827,6 @@ POSSIVEIS_PARAMETROS
         arvoreParametrosFuncao = setProxComando(arvoreParametrosFuncao, topo);
     }
     ;
-
-// VALORES_EXPRESSAO
-//     : NUMERO
-//     | ACESSO_MATRIZ
-//     | LOGICO 
-//     | CARACTERE_LITERAL
-//     ;
-
-// POSSIVEIS_PARAMETROS
-//     : token_identificador {
-//        Variavel* v = validarIdentificadorSairCasoInvalido();
-//        tipo = getTipoVariavel(v);
-//     }
-//     | NUMERO 
-//     | ACESSO_MATRIZ 
-//     | LOGICO {
-//         tipo = TIPO_LOGICO; 
-//     }
-//     | CARACTERE_LITERAL
-//     ;
 
 COMANDO_CHAMADA_FUNCAO
     : token_identificador token_simboloAbreParentese {
@@ -1060,7 +1046,7 @@ ACESSO_MATRIZ
         validarAcessoMatrizSairCasoInvalido(v);
         tipo = getTipoVariavel(v);
         expressao = criarNovoNoListaFim(tipo, yytext, expressao);
-        
+        tipoExpressaoAtribuicao = tipo;
         Lista* copiaDimensoes = copiarListaChar(dimensoesMatriz);
         Arvore* novoNo = inicializaArvore(TIPO_VARIAVEL, getNomeVariavel(v), getEscopoVariavel(v), copiaDimensoes);
         p = empilhar(p, novoNo);
@@ -1079,10 +1065,10 @@ main(){
     variaveis = NULL;
     hashFuncao = inserirFuncoesInicias(hashFuncao);
     yyparse();
-    exetuarPrograma(getFilhoEsquerda(programa), hashVariavel, hashFuncao);
-    imprimirArvoreComandos(programa);
+    exetuarPrograma(getFilhoEsquerda(programa), getFilhoCentro(programa), hashVariavel, hashFuncao);
+ //  imprimirArvoreComandos(programa);
  //   printf("IMPRIMINDO VARIAVEIS\n");
-  //imprimirTabelaHash(hashVariavel);
+  imprimirTabelaHash(hashVariavel);
  //   printf("\n");
  //   printf("IMPRIMINDO FUNCOES\n");
  //imprimirTabelaHashFuncao(hashFuncao);
