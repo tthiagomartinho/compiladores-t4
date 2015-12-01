@@ -5,47 +5,64 @@
 algoritmo teste1;
 
 variaveis
-  valor1, valor2 : real;
-  res : inteiro;
-  operacao : inteiro;
-  mat : matriz[10][10][10] de inteiro;
   lit : literal;
-  l : logico;
+  mat : matriz[10] de inteiro;
+  x, i, aux1, aux2, aux3, auxFunc: inteiro;
 fim-variaveis
 
-funcao adicao (v1 : inteiro, v2 : inteiro) : inteiro
-  total : inteiro;
-  inicio
-    total = v1 + v2;
-    retorne total;
-  fim
-fim-funcao
-
-funcao adicao2 (v1 : inteiro, v2 : inteiro) : inteiro
-  total : inteiro;
-  inicio
-    total = v1 + v2;
-    retorne (total);
-  fim
-fim-funcao
-
-funcao aleatoria () : literal
-  total : inteiro;
-  inicio
-    retorne "total";
-  fim
-fim-funcao
-
 inicio
+  mat[0] = 9;
+  mat[1] = 8;
+  mat[2] = 7;
+  mat[3] = 6;
+  mat[4] = 5;
+  mat[5] = 4;
+  mat[6] = 3;
+  mat[7] = 2;
+  mat[8] = 1;
+  mat[9] = 0;
   
-  //lit = leia();
-//  operacao = 5;
- // operacao = adicao(1, 2);
+ aux1 = mat[0] + mat[1];
+ aux2 = mat[2] + mat[3];
+  aux3 = mat[5] + mat[7];
+  auxFunc = central(aux1, aux2, aux3);
+  imprima("central");
+  imprima(auxFunc);
 
-  operacao = central(4, 5, 1);
+  auxFunc = minimo(aux1, aux2);
+  imprima("minimo");
+  imprima(auxFunc);
 
-  //lit = aleatoria();
+  auxFunc = maximo(aux1, aux2);
+  imprima("minimo");
+  imprima(auxFunc);
 
- // imprima(operacao);
- // imprima(lit);
+  imprima("aux1");
+  imprima(aux1);
+
+  imprima("aux2");
+  imprima(aux2);
+
+  imprima("aux3");
+  imprima(aux3);
+
+  se (aux1 > 15) entao
+    mat[1] = 10;
+    mat[2] = 2;
+    mat[3] = 5;
+    auxFunc = aux1 % aux2;
+    se (auxFunc > 2) entao
+      imprima("Eh maior que dois!");
+      imprima("O mod vale");
+      imprima(auxFunc);
+    senao
+      imprima("Eh menor que dois!");
+      imprima(auxFunc);
+    fim-se
+  senao
+    mat[1] = 12;
+    mat[2] = 11;
+    mat[3] = 2
+    auxFunc = aux1 % aux2;
+  fim-se
 fim

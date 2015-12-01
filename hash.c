@@ -10,6 +10,7 @@ struct variavel {
     int usada;
     int dimensaoMatriz;
     int* dimensoes;
+    int totalEspacoNecessario;
 };
 
 struct funcao {
@@ -54,8 +55,10 @@ Lista* criarNovoNoListaFim(int tipo, void* info, Lista* primeiro) {
     l -> prox = NULL;
 
     if (primeiro == NULL) {
+    	//printf ("primeiro no criado!\n");
         primeiro = l;
     } else {
+        	//printf ("outro no criado!\n");
         Lista* aux = primeiro;
         while (aux -> prox != NULL) {
             aux = aux -> prox;
@@ -159,6 +162,7 @@ Variavel* criarNovaVariavel(char* nome, Lista* dimensoesMatriz, int tipo, char* 
             totalEspacoNecessario = totalEspacoNecessario * dimensao;
         }
     }
+    v->totalEspacoNecessario = totalEspacoNecessario;
     switch (tipo) {
         case TIPO_REAL:
             v->valor = (float*) malloc(totalEspacoNecessario * sizeof (float));
@@ -224,6 +228,44 @@ void* getValorVariavel(Variavel* v){
     return v->valor;
 }
 
+void* getValorVariavelMatriz(int posicao, Variavel* v){
+    void* valor;
+    switch(v->tipo){
+        case TIPO_INTEIRO:{
+            int* vet = (int*)v->valor;
+            int i = vet[posicao];
+            valor = &i; 
+            break;
+        }
+        case TIPO_REAL:{
+            float* vet = (float*) v->valor;
+            float i = vet[posicao];
+            valor = &i; 
+            break;
+        }
+        case TIPO_LOGICO:{
+            int* vet = (int*) v->valor;
+            int i = vet[posicao];
+            valor = &i; 
+            break;
+        }
+        case TIPO_LITERAL:{
+            char* vet = (char*) v->valor;
+            char i = vet[posicao];
+            valor = &i; 
+            break;
+        }
+        case TIPO_CARACTERE:{
+            char* vet = (char*) v->valor;
+            char i = vet[posicao];
+            valor = &i; 
+            break;
+        }
+    }
+    return valor;
+
+}
+
 int getDimensaoMatriz(Variavel* v){
     return v->dimensaoMatriz;
 }
@@ -240,30 +282,43 @@ void setValorInteiro(Variavel* v, int valor){
 void setVariavelValor (Variavel* v, void* valor, int tipo, int posicaoMatriz) {
 	switch (tipo) {
 		case TIPO_INTEIRO:
-            if(posicaoMatriz == 0){
+            if(posicaoMatriz == -1){
                 memcpy(v->valor, (int*) valor, sizeof(int));
             }else{
-                // memcpy(v->valor[posicaoMatriz], (int*) valor, sizeof(int));
+                int* vet = v->valor;
+                memcpy(&vet[posicaoMatriz], valor, sizeof(int));
             }
 			return;
 		case TIPO_REAL:
-            if(posicaoMatriz == 0){
+            if(posicaoMatriz == -1){
                 memcpy(v->valor, (float*) valor, sizeof(float));
             }else{
-                // memcpy(v->valor[posicaoMatriz], (float*) valor, sizeof(float));
+                float* vet = v->valor;
+                memcpy(&vet[posicaoMatriz], valor, sizeof(float));
             }
 			return;
         case TIPO_CARACTERE:
-            strcpy(v->valor, valor);
+            if(posicaoMatriz == -1){
+                strcpy(v->valor, valor);
+            }else{
+                char* vet = v->valor;
+                memcpy(&vet[posicaoMatriz], valor, sizeof(char));
+            }
             return;
         case TIPO_LITERAL:
-            strcpy(v->valor, valor);
+       	   if(posicaoMatriz == -1){
+                strcpy(v->valor, valor);
+            }else{
+                char* vet = v->valor;
+                memcpy(&vet[posicaoMatriz], valor, sizeof(char));
+            }
             return;
 		case TIPO_LOGICO:
-			if(posicaoMatriz == 0){
+			if(posicaoMatriz == -1){
                 memcpy(v->valor, (int*) valor, sizeof(int));
             }else{
-          //      memcpy(v->valor[posicaoMatriz], (int*) valor, sizeof(int));
+                int* vet = v->valor;
+                memcpy(&vet[posicaoMatriz], valor, sizeof(int));
             }
             break;
 	}
@@ -313,13 +368,41 @@ void imprimirTabelaHash(Lista** tabelaHash) {
                 printf("Nome: %s\n", v-> nome);
                 printf("tipo: %d\n", v-> tipo);
                 if(v->tipo == TIPO_INTEIRO){
-                    printf("valor: %d\n", *((int*)v-> valor));
+                    if(v->dimensaoMatriz == 0){
+                        printf("valor: %d\n", *((int*)v-> valor));
+                    }else{
+                        int* vet = (int*) v-> valor;
+                        int j;
+                        for(j = 0; j < v->totalEspacoNecessario; j++){
+                            printf("%d ", vet[j]);
+                        } 
+                        printf("\n");
+                    }   
                 } else if (v->tipo == TIPO_REAL){
-                    printf("valor: %f\n", *((float*)v-> valor));
+                    if(v->dimensaoMatriz == 0){
+                        printf("valor: %f\n", *((float*)v-> valor));
+                    }else{
+                        float* vet = (float*) v-> valor;
+                        int j;
+                        for(j = 0; j < v->totalEspacoNecessario; j++){
+                            printf("%f ", vet[j]);
+                        } 
+                        printf("\n");
+                    }  
                 } else if (v->tipo == TIPO_LOGICO){
+                    if(v->dimensaoMatriz == 0){
                     printf("valor: %d\n", *((int*)v-> valor));
+                    }else{
+                        int* vet = (int*) v-> valor;
+                        int j;
+                        for(j = 0; j < v->totalEspacoNecessario; j++){
+                            printf("%d ", vet[j]);
+                        } 
+                        printf("\n");
+                    } 
                 } else if (v->tipo == TIPO_LITERAL){
                     printf("valor: %s\n", (char*) v-> valor);
+
                 }else{
                     printf("valor: %p\n", v-> valor);
                 }

@@ -17,8 +17,14 @@ int avaliaExpressaoInteiro (Arvore* a, Lista** hashVariavel, Lista** hashFuncao)
 				break;
 			}case TIPO_VARIAVEL:{
 				Variavel* v = buscarVariavelTabelaHash(hashVariavel, getValorNo(a), getEscopo(a));
-				int i = *((int*) getValorVariavel(v));
-				return i;
+				if(getDimensaoMatriz(v) == 0){
+					int i = *((int*) getValorVariavel(v));
+					return i;
+				}else{
+					int posicao = getPosicaoMatriz(a->dimensoesMatriz, v);
+					int i = *(int*) getValorVariavelMatriz(posicao, v);
+					return i;
+				}
 			}default:
 			break;
 		}       
@@ -66,8 +72,14 @@ float avaliaExpressaoReal (Arvore* a, Lista** hashVariavel, Lista** hashFuncao) 
 				break;
 			case TIPO_VARIAVEL:{
 				Variavel* v = buscarVariavelTabelaHash(hashVariavel, getValorNo(a), getEscopo(a));
-				float i = *((float*) getValorVariavel(v));
-				return i;
+				if(getDimensaoMatriz(v) == 0){
+					float i = *((float*) getValorVariavel(v));
+					return i;
+				}else{
+					int posicao = getPosicaoMatriz(a->dimensoesMatriz, v);
+					float i = *(float*) getValorVariavelMatriz(posicao, v);
+					return i;
+				}
 			}default:
 			break;
 		}           
@@ -144,7 +156,7 @@ int getPosicaoMatriz(Lista* dimensoesMatriz, Variavel* variavel){
 	int* dimensoes = getDimensoes(variavel);
 	int pos = 1;
 
-	int totalIndice = 0;
+	int totalIndice = -1;
 
 	for(aux = dimensoesMatriz; aux != NULL; aux = aux->prox){
 		int indice = atoi(aux->info);
@@ -167,7 +179,7 @@ void executarAtribuicao(Arvore* comandoAtual, Arvore* funcoes, Lista** hashVaria
 	Variavel* variavel = buscarVariavelTabelaHash(hashVariavel, getValorNo(variavelASerAtribuida), getEscopo(variavelASerAtribuida));
 	int tipoVariavel = getTipoVariavel(variavel);
 
-	int posicao = 0;
+	int posicao = -1;
 
 	if(variavelASerAtribuida->dimensoesMatriz != NULL){
 		posicao = getPosicaoMatriz(variavelASerAtribuida->dimensoesMatriz, variavel);
@@ -198,7 +210,7 @@ void executarAtribuicao(Arvore* comandoAtual, Arvore* funcoes, Lista** hashVaria
 				break;
 			}case TIPO_LITERAL:{
 				char* valor = getValorNo(comandoASerExecutado);
-				setVariavelValor(variavel, &valor, TIPO_LITERAL, posicao);
+				setVariavelValor(variavel, valor, TIPO_LITERAL, posicao);
 				break;
 			}
 		}
@@ -206,7 +218,8 @@ void executarAtribuicao(Arvore* comandoAtual, Arvore* funcoes, Lista** hashVaria
 }
 
 void executarLeia(Variavel* variavel){
-	int posicao = 0;
+	int posicao = -1;
+	fflush(stdin);
 	switch(getTipoVariavel(variavel)){
 		case TIPO_INTEIRO:{
 			int valor;
@@ -319,7 +332,7 @@ void executarSe(Arvore* comandoAtual, Arvore* funcoes, Lista** hashVariavel, Lis
 void executarMaisMais(Arvore* comandoAtual, Lista** hashVariavel){
 	Arvore* filhoEsquerda = getFilhoEsquerda(comandoAtual);
 	Arvore* filhoCentro = getFilhoCentro(comandoAtual);
-	int posicao = 0;
+	int posicao = -1;
 	if(filhoEsquerda != NULL){
 		Variavel* v = buscarVariavelTabelaHash(hashVariavel, getValorNo(filhoEsquerda), getEscopo(filhoEsquerda));
 		
@@ -359,7 +372,7 @@ void executarMaisMais(Arvore* comandoAtual, Lista** hashVariavel){
 void executarMenosMenos(Arvore* comandoAtual, Lista** hashVariavel){
 	Arvore* filhoEsquerda = getFilhoEsquerda(comandoAtual);
 	Arvore* filhoCentro = getFilhoCentro(comandoAtual);
-	int posicao = 0;
+	int posicao = -1;
 	if(filhoEsquerda != NULL){
 		Variavel* v = buscarVariavelTabelaHash(hashVariavel, getValorNo(filhoEsquerda), getEscopo(filhoEsquerda));
 		
@@ -470,7 +483,7 @@ void executarSeForFuncao(Arvore* comandoAtual, Arvore* funcoes, Lista** hashVari
 				Variavel* vAux = (Variavel*) parametrosFuncao->info;
 				Variavel* vFuncao = buscarVariavelTabelaHash(hashVariavel, getNomeVariavel(vAux), getNomeFuncao(f));
 
-				int posicao = 0;
+				int posicao = -1;
 				switch(getTipoNo(aux)){
 					case TIPO_VARIAVEL:{
 						Variavel* v = buscarVariavelTabelaHash(hashVariavel, getValorNo(aux), getEscopo(aux));
@@ -591,7 +604,6 @@ void executarMinimo(Lista** hashVariavel, Arvore* parametrosPassados, Variavel* 
 			}
 		}
 	}
-
 	setVariavelValor (variavel, &minimo, getTipoVariavel(variavel), posicao);
 }
 

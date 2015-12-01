@@ -32,6 +32,7 @@ Arvore* getFilhoEsquerda(Arvore* a);
 Arvore* getFilhoCentro(Arvore* a);
 Arvore* getProx(Arvore* a);
 Arvore* setProxComando(Arvore* a, Arvore* prox);
+
 int ehNoFolha(Arvore* a);
 Arvore* liberarArvore(Arvore* a);
 Arvore* setFilhosEsquerdaCentroDireita(Arvore* arvore, Arvore* arvoreEsquerda, Arvore* arvoreCentro, Arvore* arvoreDireita);

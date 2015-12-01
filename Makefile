@@ -3,7 +3,10 @@ all: compila executa
 compila:
 	flex -i analisador_lexico.l
 	bison -v analisador_sintatico.y
-	gcc -otrab3 analisador_sintatico.tab.c hash.c Arvore.c Pilha.c Executor.c -lfl
+	gcc -otrab3 analisador_sintatico.tab.c hash.c Arvore.c Pilha.c Executor.c Programa.c -lfl
+
+executa1:
+	./trab3
 
 executa:
 	./trab3 < exemplos/in1.gpt

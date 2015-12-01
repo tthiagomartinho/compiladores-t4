@@ -29,6 +29,7 @@ typedef struct lista {
 #define TIPO_FUNCAO 7
 #define TIPO_ARVORE 8
 #define TIPO_LISTA 9
+#define TIPO_PROGRAMA 10
 
 /**************************FUNCOES BASICAS DE LISTAS***************************/
 Lista* inicializarLista();
@@ -77,6 +78,8 @@ Lista** inserirListaVariaveisTabelaHash(Lista** tabelaHash, Lista* dimensoesMatr
 void imprimirRelatorioVariaveisNaoUtilizadas(Lista** hashVariavel);
 
 void* getValorVariavel(Variavel* v);
+
+void* getValorVariavelMatriz(int posicao, Variavel* v);
 
 void setValorInteiro(Variavel* v, int valor);
 
