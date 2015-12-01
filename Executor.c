@@ -563,7 +563,7 @@ void executarMaximo(Lista** hashVariavel, Arvore* parametrosPassados, Variavel* 
 		switch(getTipoNo(aux)){
 			case TIPO_VARIAVEL:{
 				Variavel* v = buscarVariavelTabelaHash(hashVariavel, getValorNo(aux), getEscopo(aux));
-				int valorVariavel = atoi(getValorVariavel(v));
+				int valorVariavel = *(int*)getValorVariavel(v);
 				if(maximo < valorVariavel){
 					maximo = valorVariavel;
 				}
@@ -578,7 +578,6 @@ void executarMaximo(Lista** hashVariavel, Arvore* parametrosPassados, Variavel* 
 			}
 		}
 	}
-
 	setVariavelValor (variavel, &maximo, getTipoVariavel(variavel), posicao);
 }
 
@@ -589,7 +588,7 @@ void executarMinimo(Lista** hashVariavel, Arvore* parametrosPassados, Variavel* 
 		switch(getTipoNo(aux)){
 			case TIPO_VARIAVEL:{
 				Variavel* v = buscarVariavelTabelaHash(hashVariavel, getValorNo(aux), getEscopo(aux));
-				int valorVariavel = atoi(getValorVariavel(v));
+				int valorVariavel = *(int*)getValorVariavel(v);
 				if(minimo > valorVariavel){
 					minimo = valorVariavel;
 				}
@@ -619,7 +618,7 @@ void executarCentral(Lista** hashVariavel, Arvore* parametrosPassados, Variavel*
 		switch(getTipoNo(aux)){
 			case TIPO_VARIAVEL:{
 				Variavel* v = buscarVariavelTabelaHash(hashVariavel, getValorNo(aux), getEscopo(aux));
-				int valorVariavel = atoi(getValorVariavel(v));
+				int valorVariavel = *(int*)getValorVariavel(v);
 				numeros[i] = valorVariavel;
 				i++;
 				break;

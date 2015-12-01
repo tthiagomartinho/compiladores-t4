@@ -1,8 +1,8 @@
 /*
-  Algoritmo Teste 1
+  Algoritmo in1
 */
   
-algoritmo teste1;
+algoritmo in1;
 
 variaveis
   lit : literal;
@@ -34,7 +34,7 @@ inicio
   imprima(auxFunc);
 
   auxFunc = maximo(aux1, aux2);
-  imprima("minimo");
+  imprima("maximo");
   imprima(auxFunc);
 
   imprima("aux1");
@@ -62,7 +62,7 @@ inicio
   senao
     mat[1] = 12;
     mat[2] = 11;
-    mat[3] = 2
+    mat[3] = 2;
     auxFunc = aux1 % aux2;
   fim-se
 fim

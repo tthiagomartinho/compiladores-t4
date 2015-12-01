@@ -1536,5 +1536,6 @@ yyerror (void){
     printf("Erro na sintatico na linha %d\n", line_num);
     liberarMemoriaAlocada();
     erroDetectado = 1;
+    // YYABORT;
     //exit(0);
 }

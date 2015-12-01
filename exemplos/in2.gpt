@@ -1,54 +1,96 @@
 /*
-  Algoritmo Teste 2
+  Algoritmo in2
 */
   
-algoritmo teste2;
+algoritmo in2;
 
 variaveis
-  m1, m2, m3 : matriz[10][10] de inteiro;
-  v1, v2 : matriz[10] de inteiro;
-  string : literal;
-  valorLogico : logico;
-  media : real;
+  lit : literal;
+  mat : matriz[10] de inteiro;
+  x, i, aux1, aux2, aux3, auxFunc: inteiro;
 fim-variaveis
 
+funcao calcularMediaInteiro(valor1 : inteiro, valor2: inteiro) : inteiro
+  media : inteiro;
+  inicio
+    media = (valor1 + valor2) / 2;
+    retorne media;
+  fim
+fim-funcao
+
+funcao calcularMediaReal(valor1 : real, valor2: real) : real
+  media : real;
+  inicio
+    media = (valor1 + valor2) / 2.0;
+    retorne media;
+  fim
+fim-funcao
 
 inicio
-  para x de 0 ate 10 faca 
-    v[x] = 0;
-    m1[x][x] = 1;
-    m2[x][x] = 2 + m1[x][x];
-    m3[x][x] = 3 + m1[x][x] + m2[x][x];
-  fim-para
+  mat[0] = 9;
+  mat[1] = 8;
+  mat[2] = 7;
+  mat[3] = 6;
+  mat[4] = 5;
+  mat[5] = 4;
+  mat[6] = 3;
+  mat[7] = 2;
+  mat[8] = 1;
+  mat[9] = 0;
+  
+ aux1 = mat[0] + mat[1];
+ aux2 = mat[2] + mat[3];
+  aux3 = mat[5] + mat[7];
+  auxFunc = central(aux1, aux2, aux3);
+  imprima("central");
+  imprima(auxFunc);
 
-  v[0] = m3[1][1] + m1[4][4] + m2[7][7];
-  se v[0] > 5 entao
-      se v[0] == 6 entao
-        media = calcularMedia(v[0], v[1]);
-        se media < 2 entao
-          imprima("A media eh ", media);
-        senao
-          media++;
-        fim-se
-      fim-se
+  auxFunc = minimo(aux1, aux2);
+  imprima("minimo");
+  imprima(auxFunc);
+
+  auxFunc = maximo(aux1, aux2);
+  imprima("minimo");
+  imprima(auxFunc);
+
+  imprima("aux1");
+  imprima(aux1);
+
+  imprima("aux2");
+  imprima(aux2);
+
+  imprima("aux3");
+  imprima(aux3);
+
+  se (aux1 > 15) entao
+    mat[1] = 10;
+    mat[2] = 2;
+    mat[3] = 5;
+    auxFunc = aux1 % aux2;
+    se (auxFunc > 2) entao
+      imprima("Eh maior que dois!");
+      imprima("O mod vale");
+      imprima(auxFunc);
+    senao
+      imprima("Eh menor que dois!");
+      imprima(auxFunc);
+    fim-se
   senao
-      inicioVetor = v[0];
-      avalie (inicioVetor):
-        caso 1:
-          v[0] = v[0]*2;
-          pare;
-        caso 2:
-          v[0] = v[0]*5;
-          pare;
-        caso 3:
-          v[0] = v[0]*6;
-          pare;
-        caso 4:
-          v[0] = v[0]*10;
-          pare;
-        caso 5:
-          v[0] = v[0]*7;
-          pare;
-      fim-avalie
+    mat[1] = 12;
+    mat[2] = 11;
+    mat[3] = 2;
+    auxFunc = aux1 % aux2;
   fim-se
+
+  auxFunc = mat[2];
+  avalie (auxFunc):
+    caso 11:
+      imprima("auxFunc vale 11");
+      pare;
+    caso 7:
+      imprima("auxFunc vale 7");
+      pare;
+  fim-avalie
+
+
 fim
