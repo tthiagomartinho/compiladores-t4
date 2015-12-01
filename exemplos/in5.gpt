@@ -1,156 +1,152 @@
 /*
-  Algoritmo Teste 1
+  Algoritmo in5
 */
   
-algoritmo teste1;
+algoritmo in5;
 
 variaveis
-  valor1, valor2 : real;
-  res : inteiro;
-  operacao : inteiro;
-  m1, m2, m3 : matriz[10][10] de inteiro;
-  v1, v2 : matriz[10] de inteiro;
-  string, string2 : literal;
-  valorLogico : logico;
-  media : real;
-  x, y : real;
+  lit : literal;
+  mat : matriz[10] de inteiro;
+  x, i, aux1, aux2, aux3, auxFunc: inteiro;
+  l : logico;
 fim-variaveis
 
-funcao adicao (v1 : real, v2 : real) : real
-  total : real;
-  inicio
-    total = v1 + v2;
-    retorne (total);
-  fim
-fim-funcao
-
-funcao subtracao (v1: real, v2: real) : real
-  total : real;
-  
-  inicio
-    total = v1 - v2;
-    retorne (total);
-  fim
-fim-funcao
-
-funcao multiplicacao (v1 : real, v2 : real) : real
-  total : real;
-  
-  inicio
-    total = v1*v2;
-    retorne (total);
-  fim
-fim-funcao
-
-funcao divisao (v1 : real, v2 : real) : real
-  total : real;
-  
-  inicio
-    total = v1 / v2;
-    retorne (total);
-  fim
-fim-funcao
-
-funcao fatorial (x : inteiro) : inteiro
-	aux : inteiro;
-inicio
-	se x == 1 entao
-		retorne 1;
-	senao
-    aux = x - 1;
-		aux =  fatorial(aux);
-		retorne x * aux;
-	fim-se
-fim
-fim-funcao
-
-funcao imprimeMedia(x: inteiro, y : inteiro) :
+funcao multiplicarNumeros(valor1 : inteiro, valor2: inteiro) : inteiro
   media : inteiro;
-inicio
-  media = ((x + y)/2);
-	imprima("A media eh ");
-  imprima(media);
-fim
+  inicio
+    media = (valor1 * valor2);
+    retorne media;
+  fim
+fim-funcao
+
+funcao calcularMediaReal(valor1 : real, valor2: real) : real
+  media : real;
+  inicio
+    media = (valor1 + valor2) / 2.0;
+    retorne media;
+  fim
 fim-funcao
 
 inicio
+  mat[0] = 9;
+  mat[1] = 8;
+  mat[2] = 7;
+  mat[3] = 6;
+  mat[4] = 5;
+  mat[5] = 4;
+  mat[6] = 3;
+  mat[7] = 2;
+  mat[8] = 1;
+  mat[9] = 0;
   
-  imprima ("Operação a ser realizada sobre os valores: ");
-  imprima ("1 - Somar");
-  imprima ("2 - Subtrair");
-  imprima ("3 - Multiplicar");
-  imprima ("4 - Dividir");
-  imprima ("0 - Sair");
-  imprima ("Escolha uma opção: ");
-  operacao = 1;
-  
-  se (operacao == 1) entao
-    res = adicao(valor1, valor2);
-  senao 
-    se (operacao == 2) entao
-      res = subtracao (valor1, valor2);
+ aux1 = mat[0] + mat[1];
+ aux2 = mat[2] + mat[3];
+  aux3 = mat[5] + mat[7];
+  auxFunc = central(aux1, aux2, aux3);
+  imprima("central");
+  imprima(auxFunc);
+
+  auxFunc = minimo(aux1, aux2);
+  imprima("minimo");
+  imprima(auxFunc);
+
+  auxFunc = maximo(aux1, aux2);
+  imprima("minimo");
+  imprima(auxFunc);
+
+  imprima("aux1");
+  imprima(aux1);
+
+  imprima("aux2");
+  imprima(aux2);
+
+  imprima("aux3");
+  imprima(aux3);
+
+  se (aux1 > 15) entao
+    mat[1] = 10;
+    mat[2] = 2;
+    mat[3] = 5;
+    auxFunc = aux1 % aux2;
+    se (auxFunc > 2) entao
+      imprima("Eh maior que dois!");
+      imprima("O mod vale");
+      imprima(auxFunc);
+    senao
+      imprima("Eh menor que dois!");
+      imprima(auxFunc);
     fim-se
+  senao
+    mat[1] = 12;
+    mat[2] = 11;
+    mat[3] = 2;
+    auxFunc = aux1 % aux2;
   fim-se
 
-  para x de 0 ate 10 faca 
-    v[x] = 0;
-    m1[x][x] = 1;
-    m2[x][x] = 2 + m1[x][x];
-    m3[x][x] = 3 + m1[x][x] + m2[x][x];
+  auxFunc = mat[2];
+  avalie (auxFunc):
+    caso 11:
+      imprima("auxFunc vale 11");
+      pare;
+    caso 7:
+      imprima("auxFunc vale 7");
+      pare;
+    caso 2:
+      imprima("auxFunc vale 2");
+      pare;
+  fim-avalie
+
+
+  imprima("aux1");
+  imprima(aux1);
+
+  imprima("aux2");
+  imprima(aux2);
+
+  imprima("aux3");
+  imprima(aux3);
+  auxFunc = multiplicarNumeros(aux1, aux2);
+  imprima("A multiplicacao vale");
+  imprima(auxFunc);
+
+  auxFunc = aux3 + aux1 * aux2;
+  imprima("O teste de precedencia vale");
+  imprima(auxFunc);
+
+  para i de 0 ate 10 faca
+    imprima(aux3);
+    aux3--;
   fim-para
 
-  v[0] = m3[1][1] + m1[4][4] + m2[7][7];
-  se v[0] > 5 entao
-      se v[0] == 6 entao
-        media = calcularMedia(v[0], v[1]);
-        se media < 2 entao
-          imprima("A media eh ", media);
-        senao
-          media++;
-        fim-se
-      fim-se
-  senao
-      inicioVetor = v[0];
-      avalie (inicioVetor):
-        caso 1:
-          v[0] = v[0]*2;
-          pare;
-        caso 2:
-          v[0] = v[0]*5;
-          pare;
-        caso 3:
-          v[0] = v[0]*6;
-          pare;
-        caso 4:
-          v[0] = v[0]*10;
-          pare;
-        caso 5:
-          v[0] = v[0]*7;
-          pare;
-      fim-avalie
-  fim-se
+  para i de 0 ate 10 passo 2 faca
+    imprima(aux3);
+    aux3--;
+  fim-para
 
-  	string = "o fatorial de ";
-	string2 = " vale ";
-	x = leia();
-	y = fatorial(x);
-	imprima(string, x, string2, y);
+  l = 2 > 3;
+  imprima(l);
 
-	x = leia();
-	y = x^2 ;
-	enquanto y > 0 faca
-		y--;
-		imprima("Tempo restante ", y);
-	fim-enquanto
+  l = 5 >= 4;
+  imprima(l);
 
-	faca:
-		y--;
-		imprima("Tempo restante ", y);
-	enquanto (y > 0)
-	fim-enquanto
+  faca:
+    aux3++;
+    aux2++;
+    ++aux1;
+    auxFunc = multiplicarNumeros(aux1, aux2);
+    auxFunc = multiplicarNumeros(auxFunc, aux3);
+    imprima(auxFunc);
+  enquanto (auxFunc < 20000)
+  fim-enquanto
 
-	l = nao (x > 10) ou x < 10;
-	l = x == 3;
+  i = 0;
+  enquanto (i <> 5) faca
+    i = i + 1;
+    imprima("i vale");
+    imprima(i);
+  fim-enquanto
 
-	imprima("l eh ", l);
+  lit = leia();
+  imprima(lit);
+
 fim

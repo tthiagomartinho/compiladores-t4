@@ -712,7 +712,7 @@ COMANDO_PARA2
     : token_faca {
 	    if (erroDetectado == 0) {
 		    Arvore* para = inicializaArvore(TIPO_LITERAL, "para", NULL, NULL);
-		    Arvore* faca = inicializaArvore(TIPO_LITERAL, "faca", NULL, NULL);
+		    Arvore* faca = inicializaArvore(TIPO_LITERAL, "para-faca", NULL, NULL);
 		    Arvore* lista = inicializaArvore(TIPO_LISTA, comandosRepeticao, NULL, NULL);
 		    faca = setFilhosEsquerdaCentroDireita(faca, NULL, NULL, NULL);
 		    para = setFilhosEsquerdaCentroDireita(para, lista, faca, NULL);
@@ -737,7 +737,7 @@ COMANDO_PARA2
 		    Arvore* ArvExp = inicializaArvore(TIPO_INTEIRO, yytext, NULL, NULL);
 		    comandosRepeticao = criarNovoNoListaFim(TIPO_ARVORE, ArvExp, comandosRepeticao);
 		    Arvore* para = inicializaArvore(TIPO_LITERAL, "para", NULL, NULL);
-		    Arvore* faca = inicializaArvore(TIPO_LITERAL, "faca", NULL, NULL);
+		    Arvore* faca = inicializaArvore(TIPO_LITERAL, "para-faca", NULL, NULL);
 		    Arvore* lista = inicializaArvore(TIPO_LISTA, comandosRepeticao, NULL, NULL);
 		    faca = setFilhosEsquerdaCentroDireita(faca, NULL, NULL, NULL);
 		    para = setFilhosEsquerdaCentroDireita(para, lista, faca, NULL);

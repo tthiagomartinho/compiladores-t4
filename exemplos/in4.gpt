@@ -1,37 +1,149 @@
 /*
-  Algoritmo Teste 4
+  Algoritmo in4
 */
   
-algoritmo teste3;
+algoritmo in4;
 
 variaveis
-	i, j : inteiro;
-	x, y : inteiro;
-	l, j : logico;
+  lit : literal;
+  mat : matriz[10] de inteiro;
+  x, i, aux1, aux2, aux3, auxFunc: inteiro;
+  l : logico;
 fim-variaveis
 
+funcao multiplicarNumeros(valor1 : inteiro, valor2: inteiro) : inteiro
+  media : inteiro;
+  inicio
+    media = (valor1 * valor2);
+    retorne media;
+  fim
+fim-funcao
+
+funcao calcularMediaReal(valor1 : real, valor2: real) : real
+  media : real;
+  inicio
+    media = (valor1 + valor2) / 2.0;
+    retorne media;
+  fim
+fim-funcao
 
 inicio
-	x = leia();
-	y = x^2 ;
-	enquanto y > 0 faca
-		y--;
-		imprima("Tempo restante ");
-		imprima(y);
-	fim-enquanto
+  mat[0] = 9;
+  mat[1] = 8;
+  mat[2] = 7;
+  mat[3] = 6;
+  mat[4] = 5;
+  mat[5] = 4;
+  mat[6] = 3;
+  mat[7] = 2;
+  mat[8] = 1;
+  mat[9] = 0;
+  
+ aux1 = mat[0] + mat[1];
+ aux2 = mat[2] + mat[3];
+  aux3 = mat[5] + mat[7];
+  auxFunc = central(aux1, aux2, aux3);
+  imprima("central");
+  imprima(auxFunc);
 
-	faca:
-		y--;
-		imprima("Tempo restante ");
-		imprima(y);
-	enquanto (y > 0)
-	fim-enquanto
+  auxFunc = minimo(aux1, aux2);
+  imprima("minimo");
+  imprima(auxFunc);
 
-	x = x % y;
+  auxFunc = maximo(aux1, aux2);
+  imprima("minimo");
+  imprima(auxFunc);
 
-	l = nao (x > 10) ou x < 10;
-	l = x == 3;
+  imprima("aux1");
+  imprima(aux1);
 
-	imprima("l eh ", l);
+  imprima("aux2");
+  imprima(aux2);
+
+  imprima("aux3");
+  imprima(aux3);
+
+  se (aux1 > 15) entao
+    mat[1] = 10;
+    mat[2] = 2;
+    mat[3] = 5;
+    auxFunc = aux1 % aux2;
+    se (auxFunc > 2) entao
+      imprima("Eh maior que dois!");
+      imprima("O mod vale");
+      imprima(auxFunc);
+    senao
+      imprima("Eh menor que dois!");
+      imprima(auxFunc);
+    fim-se
+  senao
+    mat[1] = 12;
+    mat[2] = 11;
+    mat[3] = 2;
+    auxFunc = aux1 % aux2;
+  fim-se
+
+  auxFunc = mat[2];
+  avalie (auxFunc):
+    caso 11:
+      imprima("auxFunc vale 11");
+      pare;
+    caso 7:
+      imprima("auxFunc vale 7");
+      pare;
+    caso 2:
+      imprima("auxFunc vale 2");
+      pare;
+  fim-avalie
+
+
+  imprima("aux1");
+  imprima(aux1);
+
+  imprima("aux2");
+  imprima(aux2);
+
+  imprima("aux3");
+  imprima(aux3);
+  auxFunc = multiplicarNumeros(aux1, aux2);
+  imprima("A multiplicacao vale");
+  imprima(auxFunc);
+
+  auxFunc = aux3 + aux1 * aux2;
+  imprima("O teste de precedencia vale");
+  imprima(auxFunc);
+
+  para i de 0 ate 10 faca
+  	imprima(aux3);
+  	aux3--;
+  fim-para
+
+  para i de 0 ate 10 passo 2 faca
+  	imprima(aux3);
+  	aux3--;
+  fim-para
+
+  l = 2 > 3;
+  imprima(l);
+
+  l = 5 >= 4;
+  imprima(l);
+
+  faca:
+  	aux3++;
+  	aux2++;
+  	++aux1;
+  	auxFunc = multiplicarNumeros(aux1, aux2);
+  	auxFunc = multiplicarNumeros(auxFunc, aux3);
+  	imprima(auxFunc);
+  enquanto (auxFunc < 20000)
+  fim-enquanto
+
+  i = 0;
+  enquanto (i <> 5) faca
+  	i = i + 1;
+  	imprima("i vale");
+  	imprima(i);
+  fim-enquanto
 
 fim

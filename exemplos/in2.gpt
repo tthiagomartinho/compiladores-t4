@@ -10,10 +10,10 @@ variaveis
   x, i, aux1, aux2, aux3, auxFunc: inteiro;
 fim-variaveis
 
-funcao calcularMediaInteiro(valor1 : inteiro, valor2: inteiro) : inteiro
+funcao multiplicarNumeros(valor1 : inteiro, valor2: inteiro) : inteiro
   media : inteiro;
   inicio
-    media = (valor1 + valor2) / 2;
+    media = (valor1 * valor2);
     retorne media;
   fim
 fim-funcao
@@ -90,7 +90,27 @@ inicio
     caso 7:
       imprima("auxFunc vale 7");
       pare;
+    caso 2:
+      imprima("auxFunc vale 2");
+      pare;
   fim-avalie
+
+
+  imprima("aux1");
+  imprima(aux1);
+
+  imprima("aux2");
+  imprima(aux2);
+
+  imprima("aux3");
+  imprima(aux3);
+  auxFunc = multiplicarNumeros(aux1, aux2);
+  imprima("A multiplicacao vale");
+  imprima(auxFunc);
+
+  auxFunc = aux3 + aux1 * aux2;
+  imprima("O teste de precedencia vale");
+  imprima(auxFunc);
 
 
 fim

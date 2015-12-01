@@ -310,9 +310,14 @@ void executarPara(Arvore* comandoAtual, Arvore* funcoes, Lista** hashVariavel, L
 	int valorAte = atoi(getValorNo(ate));
 
 	int i;
-
-	for(i = valorDe; i < valorAte; i = i + valorPasso){
-		exetuarPrograma(para, funcoes, hashVariavel, hashFuncao);
+	if(valorPasso == 0){
+		for(i = valorDe; i < valorAte; i++){
+			exetuarPrograma(para, funcoes, hashVariavel, hashFuncao);
+		}
+	}else{
+		for(i = valorDe; i < valorAte; i += valorPasso){
+			exetuarPrograma(para, funcoes, hashVariavel, hashFuncao);
+		}
 	}
 }
 
