@@ -58,7 +58,7 @@
     void finalizarProgramaComErro(char* erro) {
         printf("Erro semantico na linha %d. %s.\n", line_num, erro);
         liberarMemoriaAlocada();
-        printf ("memoria desalocada!\n");
+        // printf ("memoria desalocada!\n");
         erroDetectado = 1;
         //exit(0);
     }
@@ -548,17 +548,6 @@ COMANDO_ATRIBUICAO
     } 
     token_operadorAtribuicao COMANDO_ATRIBUICAO2
     | ACESSO_MATRIZ {
-        // Variavel* v = validarIdentificadorSairCasoInvalido();
-        // validarAcessoMatrizSairCasoInvalido(v);
-        // dimensoesMatriz = liberarMemoriaLista(dimensoesMatriz);
-        // tipoExpressaoAtribuicao = getTipoVariavel(v);    
-        // Lista* aux;
-        // Lista* copiaDimensoes = copiarListaChar(dimensoesMatriz);
-        // for(aux = dimensoesMatriz; aux != NULL; aux = aux->prox){
-        //     printf("%s\n", (char*) aux->info);
-        // }
-        // Arvore* novoNo = inicializaArvore(TIPO_VARIAVEL, getNomeVariavel(v), getEscopoVariavel(v), copiaDimensoes);
-        
         if (erroDetectado == 0) {
 	        arvoreComandoAtual = inicializaArvore(TIPO_LITERAL, "=", NULL, NULL);
 	        Arvore* novoNo = getArvoreTopoPilha(p);
@@ -1356,7 +1345,7 @@ Programa *compila(char *nome_programa) {
 
 int main(){
 
-	int mostrar = 1;
+	int mostrar = 0;
 	if (mostrar == 0) {
 
 	int opcao = 0;
