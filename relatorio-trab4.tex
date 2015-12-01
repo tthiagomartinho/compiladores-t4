@@ -1,0 +1,355 @@
+\documentclass[
+12pt,				% Tamanho da fonte.
+a4paper,			% Tamanho do papel.
+english,			% Idioma adicional para hifenização.
+french,				% Idioma adicional para hifenização.
+spanish,			% Idioma adicional para hifenização.
+brazil,				% O último idioma é o principal do documento.
+article
+]{abntex2}
+
+
+
+%%% Importação de pacotes. %%%
+
+% Codificação do documento em Unicode.
+\usepackage[utf8]{inputenc}
+
+\usepackage[T1]{fontenc}
+
+%opening
+\title{Trabalho 4 Compiladores}
+\author{Rodrigo Pimenta, Thiago Martinho}
+
+\begin{document}
+
+\maketitle
+
+\section{Introdução}
+
+Este trabalho teve como objetivo a construção de um interpretador para a linguagem GPortugol cujo manual pode ser encontrado em (\url{http://www.inf.ufes.br/~mberger/Disciplinas/2015_2/Compiladores/manualGPortugol.pdf}). Para tal, todas as fases de análise foram executas como proposto nos trabalhos anteriores. Além disso, foi incluída o gerador de código intermediário que representa a primeira etapa da camada de síntese de um copilador.
+
+\section{Analisador Léxico}
+Nosso analisador tem as seguintes palavras reservadas:
+\textit{fim-variaveis, algoritmo, variaveis, inteiro, real, caractere, literal, logico, inicio, verdadeiro, falso, fim, ou, e, nao, se, senao, entao, fim-se, enquanto, faca, fim-enquanto, para, de, ate, fim-para, matriz, inteiros, reais, caracteres, literais, logicos, funcao, retorne, passo}!
+
+Diferente do manual que estamos seguindo, o nosso analisador léxico está desconsiderando qualquer acento que tais palavras tenham. Por exemplo, no manual teríamos "início" como uma palavra reservada, aqui temos "inicio" (sem o acento).
+
+\subsection{Identificador}
+Consideramos um identificador qualquer palavra que comece com uma letra e seja seguida de uma outra letra, ou underline ("\_") ou um número. abaixo mostramos exemplos de identificador válidos e inválidos.
+
+\begin{center}
+	\begin{tabular}{ll}
+		\hline Exemplo & Condição  \\
+		\hline Teste & Válido \\
+		\hline Casa123 & Válido \\
+		\hline Id\_nome & Válido \\
+		\hline casa\_cor2 & Válido \\
+		\hline 1\_comando & Inválido \\
+		\hline 2ªcasa & Inválido \\
+		\hline \_pessoa & Inválido \\
+		\hline
+	\end{tabular}
+	\label{tab:}
+\end{center}
+
+\subsection{Números}
+Abaixo iremos mostrar as regras do nosso analisador léxico para identificar números inteiros e números reais e em seguida, na tabela 2, iremos mostrar exemplos de números inteiros e reais permitidos pela linguagem.
+\subsubsection{Inteiro}
+Um número inteiro é toda e qualquer palavra que só contenha números, sem caracteres como ponto "." ou vírgula ",".
+\subsubsection{Real}
+Um número real é toda e qualquer palavra que contenha um ou mais números inteiros, seguidos de um ponto "." e outro número inteiro.
+
+\begin{center}
+	\begin{tabular}{ll}
+		\hline Exemplos & Tipo \\
+		\hline 10 & Inteiro \\
+		\hline 0569 & Inteiro \\
+		\hline 10.68 & Real \\
+		\hline 0.65 & Real \\
+		\hline .95 & Inválido \\
+		\hline
+	\end{tabular}
+	\label{tab:}
+\end{center}
+
+\subsection{Literais e caracteres}
+Definimos um caractere como qualquer letra que apareça entre aspas simples, e definimos um literal como qualquer texto escrito entre aspas duplas. Abaixo mostramos uma tabela de exemplos
+
+Um ' caractere é definido como uma única letra entre duas aspas simples.
+
+\begin{center}
+	\begin{tabular}{ll}
+		\hline Exemplos & Tipo \\
+		\hline 'a' & Caractere \\
+		\hline "teste" & Literal \\
+		\hline "123" & Literal \\
+		\hline "12\_teste" & Literal \\
+		\hline "a" & Literal \\
+		\hline
+	\end{tabular}
+	\label{tab:}
+\end{center}
+
+\subsection{Lógico}
+Valor lógicos são os operadores de verdadeiro e falso. Os dois já foram definidos como palavra-reservada, porém iremos identificá-los como valores Lógicos. Abaixo mostramos um exemplo do que é considerado valor lógico.
+
+\begin{center}
+	\begin{tabular}{ll}
+		\hline Exemplos & Tipo \\
+		\hline verdadeiro & Lógico \\
+		\hline falso & Lógico \\
+		\hline "verdadeiro" & Literal \\
+		\hline
+	\end{tabular}
+	\label{tab:}
+\end{center}
+
+\subsection{Operadores e atribuição}
+Nosso analisador léxico verificará tanto operações aritméticas como operações lógicas (ou relacionais). Abaixo mostramos cada um deles e tal como fizemos anteriormente mostraremos uma tabela do que nosso analisador irá identificar como esses operadores.
+
+\subsubsection{Operador Aritmético}
+Nossa analisador irá identificar os seguintes operadores aritméticos: \textit{+, -, /, *, \& , \^, , ++, --}.
+
+\subsubsection{Operador Relacional}
+Nosso analisador irá identificar os seguintes operadores relacionais: \textit{>, >=, <, <=, ==, <>}.
+
+\subsubsection{Atribuição}
+Nosso analisador irá identificar o símbolo = como um símbolo de atribuição de variável
+
+\begin{center}
+	\begin{tabular}{ll}
+		\hline Exemplos & Tipo \\
+		\hline + &  Operador Aritmético \\
+		\hline ++ & Operador Aritmético \\
+		\hline > & Operador Relacional \\
+		\hline >= & Operador Relacional \\
+		\hline > & Operador Relacional \\
+		\hline '+' & caractere \\
+		\hline "<>" & Literal \\			
+		\hline
+	\end{tabular}
+	\label{tab:}
+\end{center}
+
+\subsection{Símbolos Especiais}
+Nosso analisador léxico identificará os seguintes elementos como caracteres especiais: \textit{" ( ) . , ; : \{ \} \# ' \\}.
+
+
+\section{Analisador Sintático}
+
+Um analisador sintático consiste em verificar a sintaxe de um programa escrito em uma determinada linguagem. Caso o código esteja totalmente de acordo com a gramática estabelecidao, nenhuma mensagem de erro é mostrada para o usuário, caso contrário, é informado qual a linha apresenta um erro de sintaxe.
+
+Esses possíveis erros podem ser de natureza diferente como, por exemplo, utilização de palavras reservadas de forma diferente do contexto que elas devem ser empregadas, comandos incompletos, falta de ponto e virgula, entre outros. 
+
+A ferramenta Bison (\url{https://www.gnu.org/software/bison/}) é um gerador de interpretadores que analisa a sintaxe de um arquivo de entrada. Segundo a descrição presente no site da ferramenta, ela se intitula como \textit{um gerador de interpretadores para fins gerais que converte uma descrição gramatical de uma gramática livre de contexto "LALR(1)" para um programa C que analisa aquela gramática. Uma vez que você esteja acostumado com "Bison", você pode usá-lo para desenvolver um ampla quantidade de interpretadores de linguagem, daqueles usados em simples calculadoras de mesa até linguagens de programação complexas.}
+
+Com o auxilio dessa ferramenta, em parceria com o Flex, foi construído neste trabalho um analisador sintático para a linguagem GPortugol de acordo coma  gramática definida por nós.
+
+
+\section{Operações Suportadas}
+Nesta seção, estão listadas e descritas todas as operações suportadas pela gramática construída.
+\subsection{Declaração de Variáveis}
+A declaração de variáveis é feita da forma como está presente no manual da linguagem, com exceção da definição do tipo matriz. Neste trabalho, foi considerado que uma matriz é composta de \textit{n} dimensões e de um tipo. Esse tipo, na definição original da ferramenta, deveria ser escrito no plural, porém para nós ele deve ser declarado da mesma forma que uma variável não-matriz, ou seja, no singular.
+
+O bloco de declaração de variáveis é opcional na construção de um programa, entretanto se este bloco for inserido, pelo menos uma variável deverá ser declarada.
+
+
+\subsection{Comandos de Seleção}
+Os comandos de seleção presentes na linguagem são o \textit{se-entao-senao-fim-se} e o \textit{avalie-caso-pare-fim-avalie}.
+O comando \textit{se} pode ser acompanhado ou não de uma cláusula \textit{senao} mas obrigatoriamente deverá ser terminado com \textit{fim-se}. Já o comando \textit{avalie} deverá ter uma expressão a ser avaliada e alguns casos a serem considerados. Esses casos não podem conter expressões lógicas e nem aritméticas, sendo possíveis apenas valores já conhecidos, como inteiros ou lógicos (da mesma forma que na linguagem C) e após o fim de cada bloco de caso, deverá ser inserido o delimitador \textit{pare}.
+
+\subsection{Comandos de Repetição}
+Os comandos de repetição suportados na linguagem são o \textit{enquanto}, o \textit{faca-enquanto} e o \textit{para}. A definição e utilização desses comandos funcionam de acordo com a especificação original da linguagem.
+
+O comando \textit{faca-enquanto} foi inserido na gramática e pode ser utilizado da seguinte forma:
+\textit{faca: BLOCO DE CÓDIGO enquanto (EXPRESSAO A SER AVALIADA) fim-enquanto}.
+
+\subsection{Declaração de Função}
+As declarações de funções seguem de forma similar a definida pelo manual da linguagem, onde vale destacar que não é possível uma função retornar uma matriz.
+
+A única exceção para declarações de funções é relativo a posição delas. As função devem ser declaradas abaixo da declaração de variáveis (quando houver) e acima do bloco principal do programa.
+
+Não é possível declarar funções de nomes \textit{leia} e \textit{imprima} por serem reservadas da linguagem.
+
+Todas as funções devem possuir uma instrução de retorno e estas não podem conter combinações de chamadas de outras funções com expressões lógicas e/ou aritméticas. Para mais detalhes consulte a seção \ref{atribuicoes}.
+
+\subsection{Chamada de Funções}
+As chamadas de funções podem conter expressões, outras funções, variáveis, literais, valores lógicos, inteiros ou reais como parâmetro. Nessa fase de construção do compilador, não é verificado se existe ou não uma função declarada correspondente.
+
+\subsection{Atribuições}
+\label{atribuicoes}
+Nosso analisador sintático verificará tanto operações aritméticas como operações lógicas (ou relacionais). Durante essa fase de avaliação do compilador, expressões que podem não fazer sentido também são aceitas, uma vez que estão escritas na forma correta. O sentido da expressão será avaliado no próximo trabalho (analisador semântico). Não são aceitas operações que incluem chamadas de funções combinadas com expressões aritméticas ou lógicas como por exemplo \textit{x + fatorial(2);} e nem expressões que envolvem os operadores \textit{++} ou \textit{$-$$-$}.
+
+Alguns exemplos de expressões incorretas mas que são aceitas pelo analisador sintático são:
+
+
+\begin{math}
+	\mathit{x = verdadeiro ^ 3;}
+\end{math}
+
+\begin{math}
+	\mathit{x = 10 + verdadeiro;}
+\end{math}
+
+\begin{math}
+	\mathit{x[2] = "exemplo" * 7;}
+\end{math}
+
+
+\section{A gramática}
+Neste seção, está descrito de forma mais formal a gramática construída. O símbolo * indica a ocorrência de zero ou mais vezes de um item, o símbolo + indica a ocorrência de uma ou mais vezes e o símbolo ? indica que o item é opcional.
+A avaliação de uma cadeia de caracteres sempre começa pela regra \textit{ALGORITMO}.
+
+\begin{itemize}
+	\item ALGORITMO : token\char`_algoritmo token\char`_identificador token\char`_simboloPontoVirgula PROGRAMA
+	\item PROGRAMA : (VARIAVEIS)? (DECLARACAO\char`_FUNCAO)? PROGRAMA\char`_PRINCIPAL; 
+	\item VARIAVEIS : token\char`_variaveis DECLARACAO\char`_VARIAVEL token\char`_fimVariaveis
+	\item DECLARACAO\char`_VARIAVEL : token\char`_identificador token\char`_simboloVirgula DECLARACAO\char`_VARIAVEL $+$ | token\char`_identificador token\char`_simboloDoisPontos TIPO\char`_VARIAVEIS token\char`_simboloPontoVirgula (DECLARACAO\char`_VARIAVEL+)?
+	\item DECLARACAO\char`_FUNCAO : (DECLARACAO\char`_FUNCAO+)? token\char`_funcao token\char`_identificador token\char`_simboloAbreParentese (PARAMETRO\char`_DECLARACAO\char`_FUNCAO)? token\char`_simboloFechaParentese token\char`_simboloDoisPontos (TIPO\char`_VARIAVEL\char`_PRIMITIVO)? ROTINA\char`_FUNCAO token\char`_fimFuncao
+	\item PARAMETRO\char`_DECLARACAO\char`_FUNCAO : (PARAMETRO\char`_DECLARACAO\char`_FUNCAO token\char`_simboloVirgula +)?  token\char`_identificador token\char`_simboloDoisPontos TIPO\char`_VARIAVEL\char`_PRIMITIVO
+	\item ROTINA\char`_FUNCAO : (DECLARACAO\char`_VARIAVEL)? token\char`_inicio LISTA\char`_COMANDOS token\char`_fim
+	\item COMANDO\char`_RETORNO : token\char`_retorne (EXPRESSAO)? token\char`_simboloPontoVirgula
+	\item TIPO\char`_VARIAVEIS : MATRIZ | TIPO\char`_VARIAVEL\char`_PRIMITIVO
+	\item TIPO\char`_VARIAVEL\char`_PRIMITIVO : token\char`_tipoReal | token\char`_tipoInteiro | token\char`_tipoCaractere | token\char`_tipoLogico | token\char`_tipoLiteral
+	\item MATRIZ : token\char`_tipoMatriz POSICAO\char`_MATRIZ token\char`_de TIPO\char`_VARIAVEL\char`_PRIMITIVO
+	\item POSICAO\char`_MATRIZ : (POSICAO\char`_MATRIZ+)? token\char`_simboloAbreColchete token\char`_identificador token\char`_simboloFechaColchete | (POSICAO\char`_MATRIZ+)? token\char`_simboloAbreColchete token\char`_inteiro token\char`_simboloFechaColchete
+	\item PROGRAMA\char`_PRINCIPAL : token\char`_inicio (LISTA\char`_COMANDOS+)? token\char`_fim
+	\item LISTA\char`_COMANDOS : (LISTA\char`_COMANDOS+)? COMANDO\char`_ATRIBUICAO token\char`_simboloPontoVirgula | (LISTA\char`_COMANDOS+)? COMANDO\char`_ENQUANTO | (LISTA\char`_COMANDOS+)? COMANDO\char`_PARA | (LISTA\char`_COMANDOS+)? COMANDO\char`_LEIA | (LISTA\char`_COMANDOS+)? COMANDO\char`_IMPRIMA | (LISTA\char`_COMANDOS+)? COMANDO\char`_CHAMADA\char`_FUNCAO token\char`_simboloPontoVirgula | (LISTA\char`_COMANDOS+)? COMANDO\char`_SE | (LISTA\char`_COMANDOS+)? COMANDO\char`_FACA\char`_ENQUANTO | (LISTA\char`_COMANDOS)+? COMANDO\char`_AVALIE | (LISTA\char`_COMANDOS+)? COMANDO\char`_RETORNO | (LISTA\char`_COMANDOS+)? COMANDO\char`_MAIS\char`_MAIS\char`_MENOS\char`_MENOS
+	\item COMANDO\char`_ATRIBUICAO : token\char`_identificador token\char`_operadorAtribuicao VALOR\char`_A\char`_SER\char`_ATRIBUIDO | ACESSO\char`_MATRIZ token\char`_operadorAtribuicao VALOR\char`_A\char`_SER\char`_ATRIBUIDO
+	\item VALOR\char`_A\char`_SER\char`_ATRIBUIDO : (VALOR\char`_A\char`_SER\char`_ATRIBUIDO+)? EXPRESSAO |  (VALOR\char`_A\char`_SER\char`_ATRIBUIDO+)? COMANDO\char`_CHAMADA\char`_FUNCAO
+	\item COMANDO\char`_ENQUANTO : token\char`_enquanto EXPRESSAO token\char`_faca LISTA\char`_COMANDOS token\char`_fimEnquanto
+	\item COMANDO\char`_PARA token\char`_para token\char`_identificador token\char`_de EXPRESSAO (token\char`_passo NUMERO)? token\char`_faca LISTA\char`_COMANDOS token\char`_fimPara
+	\item COMANDO\char`_SE : token\char`_se EXPRESSAO token\char`_entao LISTA\char`_COMANDOS (token\char`_senao LISTA\char`_COMANDOS)? token\char`_fimSe
+	\item COMANDO\char`_FACA\char`_ENQUANTO : token\char`_faca token\char`_simboloDoisPontos LISTA\char`_COMANDOS token\char`_enquanto token\char`_simboloAbreParentese EXPRESSAO token\char`_simboloFechaParentese token\char`_fimEnquanto
+	\item COMANDO\char`_AVALIE : token\char`_avalie token\char`_simboloAbreParentese token\char`_identificador token\char`_simboloFechaParentese token\char`_simboloDoisPontos AVALIE\char`_CASO token\char`_fimAvalie
+	\item AVALIE\char`_CASO: (AVALIE\char`_CASO+)? token\char`_caso token\char`_identificador token\char`_simboloDoisPontos LISTA\char`_COMANDOS token\char`_pare token\char`_simboloPontoVirgula | (AVALIE\char`_CASO+)? token\char`_caso token\char`_inteiro token\char`_simboloDoisPontos LISTA\char`_COMANDOS token\char`_pare token\char`_simboloPontoVirgula
+	\item COMANDO\char`_LEIA : token\char`_identificador token\char`_operadorAtribuicao token\char`_leia token\char`_simboloAbreParentese token\char`_simboloFechaParentese token\char`_simboloPontoVirgula
+	\item COMANDO\char`_IMPRIMA : token\char`_imprima token\char`_simboloAbreParentese PARAMETROS\char`_FUNCAO token\char`_simboloFechaParentese token\char`_simboloPontoVirgula
+	\item PARAMETROS\char`_FUNCAO : (PARAMETROS\char`_FUNCAO token\char`_simboloVirgula+)? EXPRESSAO | (PARAMETROS\char`_FUNCAO token\char`_simboloVirgula+)? COMANDO\char`_CHAMADA\char`_FUNCAO
+	\item COMANDO\char`_CHAMADA\char`_FUNCAO : token\char`_identificador token\char`_simboloAbreParentese (PARAMETROS\char`_FUNCAO)? token\char`_simboloFechaParentese
+	\item COMANDO\char`_MAIS\char`_MAIS\char`_MENOS\char`_MENOS : token\char`_identificador token\char`_operadorSomaSoma token\char`_simboloPontoVirgula |  token\char`_operadorSomaSoma token\char`_identificador token\char`_simboloPontoVirgula | token\char`_identificador token\char`_operadorSubtraiSubtrai token\char`_simboloPontoVirgula | token\char`_operadorSubtraiSubtrai token\char`_identificador token\char`_simboloPontoVirgula
+	\item EXPRESSAO : EXPRESSAO\char`_SIMPLES | EXPRESSAO\char`_SIMPLES OPERADORES\char`_RELACIONAIS EXPRESSAO\char`_SIMPLES
+	\item EXPRESSAO\char`_SIMPLES : TERMO | EXPRESSAO\char`_SIMPLES OPERADORES\char`_BAIXA\char`_PRECEDENCIA TERMO
+	\item TERMO : FATOR | TERMO OPERADORES\char`_ALTA\char`_PRECEDENCIA FATOR
+	\item FATOR : token\char`_identificador | token\char`_operadorNao FATOR | NUMERO | ACESSO\char`_MATRIZ | token\char`_verdadeiro | token\char`_falso | token\char`_literal | token\char`_caractere | token\char`_simboloAbreParentese EXPRESSAO token\char`_simboloFechaParentese
+	\item NUMERO : token\char`_inteiro | token\char`_inteiroNegativo | token\char`_real | token\char`_realNegativo
+	\item ACESSO\char`_MATRIZ : token\char`_identificador POSICAO\char`_MATRIZ
+	\item OPERADORES\char`_RELACIONAIS : token\char`_operadorIgualIgual | token\char`_operadorMenor | token\char`_operadorMenorIgual | toen\char`_operadorMaiorIgual | token\char`_operadorMaior | token\char`_operadorDiferente
+	\item OPERADORES\char`_BAIXA\char`_PRECEDENCIA : token\char`_operadorMais | token\char`_operadorMenos | token\char`_operadorOU
+	\item OPERADORES\char`_ALTA\char`_PRECEDENCIA : token\char`_operadorVezes | token\char`_operadorDividir | token\char`_operadorPorcento| token\char`_operadorPotencia | token\char`_operadorE
+\end{itemize}
+
+
+\section{Analisador Semântico}
+
+A construção de um analisador semântico é a terceira etapa do processo de codificação de um compilador para uma linguagem qualquer. Este analisador tem por objetivo verificar os erros semânticos contidos no código a ser compilado. 
+
+Nesta etapa de compilação são verificados erros de tipo, de utilização de variáveis não declaradas, de chamadas e declarações de funções, de expressões, entre outros. Para os casos onde não há erro semântico, as variáveis declaradas já podem ser alocadas na memória a fim de diminuir o tempo de execução do programa.  
+
+\section{Tabela de Variáveis e Funções}
+
+Para realizar o controle de variáveis e funções foram criadas duas tabelas hash com um tempo de acesso constante de tamanho fixo de 97 posições. Para cada elemento declarado no programa, foi criado um registro na tabela posicionado de acordo com a função hash utilizada que calcula o resto da divisão entre a soma do equivalente ASCII de cada letra do nome do elemento e o tamanho da tabela. As colisões foram tratadas utilizando lista simplesmente encadeada, sendo que um novo elemento é inserido no começo da lista.
+
+A tabela de variáveis apresenta a seguinte estrutura:
+
+\begin{itemize}
+	\item nome;
+	\item valor;
+	\item escopo;
+	\item tipo;
+	\item se a variável é usada ou não;
+	\item dimensão da matriz;
+	\item tamanho máximo de elementos para cada dimensão da matriz; 
+\end{itemize}
+
+Para os elementos que não são matrizes, os campos que representam as dimensões não são preenchidos;
+
+Já a tabela de funções contém:
+
+\begin{itemize}
+	\item nome;
+	\item tipo de parâmetros;
+	\item tipo de retorno;
+	\item aridade;
+\end{itemize}
+
+Para simplificação e padronização do programa, foram definidas as seguintes constantes que identificam os tipos primitivos:
+
+\begin{table}[h]
+	\caption{Constantes que identificam os tipos de variáveis primitivos}
+	\label{tbl-divisao-sistema}
+	\centering
+	\begin{tabular}{| p{47mm} | p{100mm} | }\hline		
+		\textbf{Tipo} & 
+		\textbf{Valor}\\
+		\hline
+		TIPO VOID & -1\\
+		\hline
+		TIPO REAL & 0\\
+		\hline
+		TIPO INTEIRO & 1\\
+		\hline
+		TIPO CARACTERE & 2\\
+		\hline
+		TIPO LITERAL & 3\\
+		\hline
+		TIPO LOGICO & 4\\
+		\hline
+	\end{tabular}
+\end{table}
+
+\section{Erros semânticos}
+Nesta seção, estão listados e descritos todos os possíveis erros semânticos na escrita de um programa em GPortugol.
+
+\subsection{Variável redeclarada}
+Uma mesma variável não pode ser redeclarada num mesmo escopo, logo quando isso ocorrer nosso programa informará qual a linha que uma variável foi redeclarada.
+
+\subsection{Expressão}
+Uma expressão é composta por operadores aritméticos ou operadores lógicos, não sendo possível uma mesma expressão conter os dois tipos. Caso, na expressão, exista elementos de tipos diferentes, uma mensagem de erro é exibida e o programa abortado.
+
+\subsection{Matrizes}
+Caso o usuário tente acessar uma posição de uma variável que não seja do tipo matriz, uma mensagem de erro é exibida e o programa abortado. A mesma coisa ocorre, caso uma posição inválida da matriz tente se acessada.
+
+\subsection{Operadores incremento e decremento}
+Apenas variáveis do tipo inteiro ou real podem estar associadas aos comandos ++ ou \textit{$-$$-$}.
+
+\subsection{Função redeclarada}
+Duas funções não podem ter o mesmo nome, se este caso existir nosso programa tratará isso como erro e informará a linha de tal redeclaração.
+
+\subsection{Retorno de função}
+Para os retornos de função ou elas retornam o tipo \textit{void} ou elas retornam um outro tipo qualquer. Uma função do tipo \textit{inteiro} só poderá ter como retorno um variável desse tipo, caso contrário será identificado um erro no comando retorno. Da mesma forma, se uma função não possuir um tipo e tiver como retorno uma variável do tipo \textit{inteiro} nosso programa informará um erro.
+
+\subsection{Chamada de função}
+Quando declaramos uma função informamos qual o tipo de retorno dela, qual seu nome e quais são os parâmetros que estamos esperando. Quando chamamos uma função devemos prestar atenção em duas coisas, a primeira delas é se a função existe, ou seja, não podemos chamar a função \textit{dobrar} se a mesma não tiver sido declarada anteriormente no programa. Em segundo lugar se a função espera dois parâmetros e passarmos somente um, ou se a função espera valores do tipo \textit{inteiro} e passarmos valores do tipo \textit{logico} nossa chamada de função estará incorreta. Nosso programa deverá identificar esses dois erros e informar ao usuário a linha na qual esse erros ocorreram, especificando qual tipo de erro ocorreu (" Função não declarada " ou " parâmetros passados na chamada de função não condizem com a declaração ").
+
+\subsection{Atribuição de tipos diferentes}
+Uma variável do tipo \textit{inteiro} não pode receber o valor \textit{verdadeiro}, por exemplo, da mesma forma que uma variável do tipo \textit{logico} não pode receber um número ou algo do tipo. Logo quando houver esse tipo de erro nosso programa o identificará e mostrará a linha que esse erro ocorre.
+
+\subsection{Comando \textit{Para}}
+O comando \textit{para} possui a restrição de que a variável auxiliar de iteração deve ser do tipo \textit{inteiro}, logo qualquer tipo diferente disso devemos interromper o programa e informar um erro.
+
+\subsection{Comando \textit{Avalie}}
+O comando \textit{Avalie} deve ser utilizado somente para variáveis do tipo \textit{inteiro}, logo qualquer variável que não seja desse tipo devemos informar um erro.
+
+\section{Considerações em relação a gramática da linguagem}
+Em relação ao analisador sintático desenvolvido no trabalho passado, a gramática do nosso compilador teve algumas alterações, sendo importante destacar:
+
+\begin{itemize}
+	\item Não é possível fazer várias chamadas de funções em cadeia. Exemplo: \textit{imprima(fatorial(leia())))};
+	\item Não é possível ter chamadas de funções contendo expressões. Exemplo: \textit{fatorial(x-1)};
+	\item O comando \textit{faca - enquanto} não mais requer parenteses na expressão a ser avaliada. O item passa a ser opcional;
+	\item O comando imprima pode ter apenas um parâmetro;
+	\item Não é possível acessar uma matriz utilizando identificadores. Apenas números inteiros podem ser utilizados como índices;
+	\item Comando \textit{leia()} tem que ser utilizado junto com o comando atribuição;
+	\item No comando \textit{AVALIE - CASO} só números inteiros podem ser utilizados como índices;
+\end{itemize}
+
+\section{Gerador de Código Intermediário}
+
+Após a conclusão com sucesso das três etapas de análise do código a ser compilado, chega-se na fase de síntese através da rotina de gerar um código intermediário que consiste em transformar os comandos inseridos pelo usuário no arquivo fonte em algo passível de execução.
+
+Todos os comandos presentes no arquivo são mapeados, de forma ordenada, em uma estrutura de dados no formato de árvore. Essa estrutura se comporta tanto com uma árvore como uma lista, uma vez que cada comando está associado ao seu predecessor.
+
+
+\end{document}
