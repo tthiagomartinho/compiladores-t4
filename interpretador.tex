@@ -27,7 +27,9 @@ article
 
 \section{Introdução}
 
-Este trabalho teve como objetivo a construção de um interpretador para a linguagem GPortugol cujo manual pode ser encontrado em (\url{http://www.inf.ufes.br/~mberger/Disciplinas/2015_2/Compiladores/manualGPortugol.pdf}). Para tal, todas as fases de análise foram executas como proposto nos trabalhos anteriores. Além disso, foi incluída o gerador de código intermediário que representa a primeira etapa da camada de síntese de um copilador.
+Este trabalho teve como objetivo a construção de um interpretador para a linguagem GPortugol cujo manual pode ser encontrado em (\url{http://www.inf.ufes.br/~mberger/Disciplinas/2015_2/Compiladores/manualGPortugol.pdf}). Para tal, todas as fases de análise (Léxica, Sintática e Semântica) foram executas como proposto nos trabalhos anteriores juntamente com um gerador de código intermediário que representa a primeira etapa da camada de síntese de um compilador.
+
+Nas próximas seções estão descritas todas as etapas de análise com mais detalhes assim como a especificação da gramática, além do gerador de código intermediário.
 
 \section{Analisador Léxico}
 Nosso analisador tem as seguintes palavras reservadas:
@@ -213,22 +215,25 @@ A avaliação de uma cadeia de caracteres sempre começa pela regra \textit{ALGO
 	\item TIPO\char`_VARIAVEIS : MATRIZ | TIPO\char`_VARIAVEL\char`_PRIMITIVO
 	\item TIPO\char`_VARIAVEL\char`_PRIMITIVO : token\char`_tipoReal | token\char`_tipoInteiro | token\char`_tipoCaractere | token\char`_tipoLogico | token\char`_tipoLiteral
 	\item MATRIZ : token\char`_tipoMatriz POSICAO\char`_MATRIZ token\char`_de TIPO\char`_VARIAVEL\char`_PRIMITIVO
-	\item POSICAO\char`_MATRIZ : (POSICAO\char`_MATRIZ+)? token\char`_simboloAbreColchete token\char`_identificador token\char`_simboloFechaColchete | (POSICAO\char`_MATRIZ+)? token\char`_simboloAbreColchete token\char`_inteiro token\char`_simboloFechaColchete
+	\item POSICAO\char`_MATRIZ : (POSICAO\char`_MATRIZ+)? token\char`_simboloAbreColchete token\char`_inteiro token\char`_simboloFechaColchete
 	\item PROGRAMA\char`_PRINCIPAL : token\char`_inicio (LISTA\char`_COMANDOS+)? token\char`_fim
-	\item LISTA\char`_COMANDOS : (LISTA\char`_COMANDOS+)? COMANDO\char`_ATRIBUICAO token\char`_simboloPontoVirgula | (LISTA\char`_COMANDOS+)? COMANDO\char`_ENQUANTO | (LISTA\char`_COMANDOS+)? COMANDO\char`_PARA | (LISTA\char`_COMANDOS+)? COMANDO\char`_LEIA | (LISTA\char`_COMANDOS+)? COMANDO\char`_IMPRIMA | (LISTA\char`_COMANDOS+)? COMANDO\char`_CHAMADA\char`_FUNCAO token\char`_simboloPontoVirgula | (LISTA\char`_COMANDOS+)? COMANDO\char`_SE | (LISTA\char`_COMANDOS+)? COMANDO\char`_FACA\char`_ENQUANTO | (LISTA\char`_COMANDOS)+? COMANDO\char`_AVALIE | (LISTA\char`_COMANDOS+)? COMANDO\char`_RETORNO | (LISTA\char`_COMANDOS+)? COMANDO\char`_MAIS\char`_MAIS\char`_MENOS\char`_MENOS
+	\item LISTA\char`_COMANDOS : (LISTA\char`_COMANDOS+)? COMANDO\char`_ATRIBUICAO token\char`_simboloPontoVirgula | (LISTA\char`_COMANDOS+)? COMANDO\char`_ENQUANTO | (LISTA\char`_COMANDOS+)? COMANDO\char`_PARA | (LISTA\char`_COMANDOS+)? COMANDO\char`_IMPRIMA | (LISTA\char`_COMANDOS+)? COMANDO\char`_CHAMADA\char`_FUNCAO token\char`_simboloPontoVirgula | (LISTA\char`_COMANDOS+)? COMANDO\char`_SE | (LISTA\char`_COMANDOS+)? COMANDO\char`_FACA\char`_ENQUANTO | (LISTA\char`_COMANDOS)+? COMANDO\char`_AVALIE | (LISTA\char`_COMANDOS+)? COMANDO\char`_RETORNO | (LISTA\char`_COMANDOS+)? COMANDO\char`_MAIS\char`_MAIS\char`_MENOS\char`_MENOS
 	\item COMANDO\char`_ATRIBUICAO : token\char`_identificador token\char`_operadorAtribuicao VALOR\char`_A\char`_SER\char`_ATRIBUIDO | ACESSO\char`_MATRIZ token\char`_operadorAtribuicao VALOR\char`_A\char`_SER\char`_ATRIBUIDO
-	\item VALOR\char`_A\char`_SER\char`_ATRIBUIDO : (VALOR\char`_A\char`_SER\char`_ATRIBUIDO+)? EXPRESSAO |  (VALOR\char`_A\char`_SER\char`_ATRIBUIDO+)? COMANDO\char`_CHAMADA\char`_FUNCAO
+	
+	\item VALOR\char`_A\char`_SER\char`_ATRIBUIDO : (VALOR\char`_A\char`_SER\char`_ATRIBUIDO+)? EXPRESSAO |  (VALOR\char`_A\char`_SER\char`_ATRIBUIDO+)? COMANDO\char`_CHAMADA\char`_FUNCAO  |  (VALOR\char`_A\char`_SER\char`_ATRIBUIDO+)? COMANDO\char`_LEIA
+	
 	\item COMANDO\char`_ENQUANTO : token\char`_enquanto EXPRESSAO token\char`_faca LISTA\char`_COMANDOS token\char`_fimEnquanto
 	\item COMANDO\char`_PARA token\char`_para token\char`_identificador token\char`_de EXPRESSAO (token\char`_passo NUMERO)? token\char`_faca LISTA\char`_COMANDOS token\char`_fimPara
 	\item COMANDO\char`_SE : token\char`_se EXPRESSAO token\char`_entao LISTA\char`_COMANDOS (token\char`_senao LISTA\char`_COMANDOS)? token\char`_fimSe
-	\item COMANDO\char`_FACA\char`_ENQUANTO : token\char`_faca token\char`_simboloDoisPontos LISTA\char`_COMANDOS token\char`_enquanto token\char`_simboloAbreParentese EXPRESSAO token\char`_simboloFechaParentese token\char`_fimEnquanto
+	\item COMANDO\char`_FACA\char`_ENQUANTO : token\char`_faca token\char`_simboloDoisPontos LISTA\char`_COMANDOS token\char`_enquanto EXPRESSAO token\char`_fimEnquanto
 	\item COMANDO\char`_AVALIE : token\char`_avalie token\char`_simboloAbreParentese token\char`_identificador token\char`_simboloFechaParentese token\char`_simboloDoisPontos AVALIE\char`_CASO token\char`_fimAvalie
 	\item AVALIE\char`_CASO: (AVALIE\char`_CASO+)? token\char`_caso token\char`_inteiro token\char`_simboloDoisPontos LISTA\char`_COMANDOS token\char`_pare token\char`_simboloPontoVirgula
 	\item COMANDO\char`_LEIA : token\char`_identificador token\char`_operadorAtribuicao token\char`_leia token\char`_simboloAbreParentese token\char`_simboloFechaParentese token\char`_simboloPontoVirgula
 	
 	\item COMANDO\char`_IMPRIMA : token\char`_imprima token\char`_simboloAbreParentese token\char`_identificador token\char`_simboloFechaParentese token\char`_simboloPontoVirgula | token\char`_imprima token\char`_simboloAbreParentese NUMERO token\char`_simboloFechaParentese token\char`_simboloPontoVirgula | token\char`_imprima token\char`_simboloAbreParentese ACESSO\char`_MATRIZ token\char`_simboloFechaParentese token\char`_simboloPontoVirgula | token\char`_imprima token\char`_simboloAbreParentese LOGICO token\char`_simboloFechaParentese token\char`_simboloPontoVirgula | token\char`_imprima token\char`_simboloAbreParentese LITERAL token\char`_simboloFechaParentese token\char`_simboloPontoVirgula | token\char`_imprima token\char`_simboloAbreParentese CARACTERE token\char`_simboloFechaParentese token\char`_simboloPontoVirgula
 	 
-	\item PARAMETROS\char`_FUNCAO : (PARAMETROS\char`_FUNCAO token\char`_simboloVirgula+)? EXPRESSAO | (PARAMETROS\char`_FUNCAO token\char`_simboloVirgula+)? COMANDO\char`_CHAMADA\char`_FUNCAO
+	\item PARAMETROS\char`_FUNCAO : (PARAMETROS\char`_FUNCAO token\char`_simboloVirgula+)? FATOR
+	
 	\item COMANDO\char`_CHAMADA\char`_FUNCAO : token\char`_identificador token\char`_simboloAbreParentese (PARAMETROS\char`_FUNCAO)? token\char`_simboloFechaParentese
 	\item COMANDO\char`_MAIS\char`_MAIS\char`_MENOS\char`_MENOS : token\char`_identificador token\char`_operadorSomaSoma token\char`_simboloPontoVirgula |  token\char`_operadorSomaSoma token\char`_identificador token\char`_simboloPontoVirgula | token\char`_identificador token\char`_operadorSubtraiSubtrai token\char`_simboloPontoVirgula | token\char`_operadorSubtraiSubtrai token\char`_identificador token\char`_simboloPontoVirgula
 	\item EXPRESSAO : EXPRESSAO\char`_SIMPLES | EXPRESSAO\char`_SIMPLES OPERADORES\char`_RELACIONAIS EXPRESSAO\char`_SIMPLES
@@ -334,24 +339,11 @@ O comando \textit{para} possui a restrição de que a variável auxiliar de iter
 \subsection{Comando \textit{Avalie}}
 O comando \textit{Avalie} deve ser utilizado somente para variáveis do tipo \textit{inteiro}, logo qualquer variável que não seja desse tipo devemos informar um erro.
 
-\section{Considerações em relação a gramática da linguagem}
-Em relação ao analisador sintático desenvolvido no trabalho passado, a gramática do nosso compilador teve algumas alterações, sendo importante destacar:
-
-\begin{itemize}
-	\item Não é possível fazer várias chamadas de funções em cadeia. Exemplo: \textit{imprima(fatorial(leia())))};
-	\item Não é possível ter chamadas de funções contendo expressões. Exemplo: \textit{fatorial(x-1)};
-	\item O comando \textit{faca - enquanto} não mais requer parenteses na expressão a ser avaliada. O item passa a ser opcional;
-	\item O comando imprima pode ter apenas um parâmetro;
-	\item Não é possível acessar uma matriz utilizando identificadores. Apenas números inteiros podem ser utilizados como índices;
-	\item Comando \textit{leia()} tem que ser utilizado junto com o comando atribuição;
-	\item No comando \textit{AVALIE - CASO} só números inteiros podem ser utilizados como índices;
-\end{itemize}
-
 \section{Gerador de Código Intermediário}
 
-Após a conclusão com sucesso das três etapas de análise do código a ser compilado, chega-se na fase de síntese através da rotina de gerar um código intermediário que consiste em transformar os comandos inseridos pelo usuário no arquivo fonte em algo passível de execução.
+Após a conclusão com sucesso das três etapas de análise do código a ser compilado, chega-se na fase de síntese através da rotina de gerar um código intermediário, que consiste em transformar os comandos inseridos pelo usuário no arquivo fonte em algo passível de execução.
 
-Todos os comandos presentes no arquivo são mapeados, de forma ordenada, em uma estrutura de dados no formato de árvore. Essa estrutura se comporta tanto com uma árvore como uma lista, uma vez que cada comando está associado ao seu predecessor.
+Todos os comandos presentes no arquivo são mapeados, de forma ordenada, em uma estrutura de dados no formato de árvore. Essa estrutura se comporta tanto com uma árvore como uma lista, já vez que cada comando está associado ao seu predecessor.
 
 Todos os programas compilados dentro do interpretador são mantidos em memória e caso um mesmo programa seja compilado mais de uma vez, a sua árvore de execução é trocada pela mais recente. Em caso de algum erro léxico, sintático ou semântico na compilação de um programa, os outros não sofrem nenhum impacto.
 
