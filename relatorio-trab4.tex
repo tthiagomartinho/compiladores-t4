@@ -223,9 +223,11 @@ A avaliação de uma cadeia de caracteres sempre começa pela regra \textit{ALGO
 	\item COMANDO\char`_SE : token\char`_se EXPRESSAO token\char`_entao LISTA\char`_COMANDOS (token\char`_senao LISTA\char`_COMANDOS)? token\char`_fimSe
 	\item COMANDO\char`_FACA\char`_ENQUANTO : token\char`_faca token\char`_simboloDoisPontos LISTA\char`_COMANDOS token\char`_enquanto token\char`_simboloAbreParentese EXPRESSAO token\char`_simboloFechaParentese token\char`_fimEnquanto
 	\item COMANDO\char`_AVALIE : token\char`_avalie token\char`_simboloAbreParentese token\char`_identificador token\char`_simboloFechaParentese token\char`_simboloDoisPontos AVALIE\char`_CASO token\char`_fimAvalie
-	\item AVALIE\char`_CASO: (AVALIE\char`_CASO+)? token\char`_caso token\char`_identificador token\char`_simboloDoisPontos LISTA\char`_COMANDOS token\char`_pare token\char`_simboloPontoVirgula | (AVALIE\char`_CASO+)? token\char`_caso token\char`_inteiro token\char`_simboloDoisPontos LISTA\char`_COMANDOS token\char`_pare token\char`_simboloPontoVirgula
+	\item AVALIE\char`_CASO: (AVALIE\char`_CASO+)? token\char`_caso token\char`_inteiro token\char`_simboloDoisPontos LISTA\char`_COMANDOS token\char`_pare token\char`_simboloPontoVirgula
 	\item COMANDO\char`_LEIA : token\char`_identificador token\char`_operadorAtribuicao token\char`_leia token\char`_simboloAbreParentese token\char`_simboloFechaParentese token\char`_simboloPontoVirgula
-	\item COMANDO\char`_IMPRIMA : token\char`_imprima token\char`_simboloAbreParentese PARAMETROS\char`_FUNCAO token\char`_simboloFechaParentese token\char`_simboloPontoVirgula
+	
+	\item COMANDO\char`_IMPRIMA : token\char`_imprima token\char`_simboloAbreParentese token\char`_identificador token\char`_simboloFechaParentese token\char`_simboloPontoVirgula | token\char`_imprima token\char`_simboloAbreParentese NUMERO token\char`_simboloFechaParentese token\char`_simboloPontoVirgula | token\char`_imprima token\char`_simboloAbreParentese ACESSO\char`_MATRIZ token\char`_simboloFechaParentese token\char`_simboloPontoVirgula | token\char`_imprima token\char`_simboloAbreParentese LOGICO token\char`_simboloFechaParentese token\char`_simboloPontoVirgula | token\char`_imprima token\char`_simboloAbreParentese LITERAL token\char`_simboloFechaParentese token\char`_simboloPontoVirgula | token\char`_imprima token\char`_simboloAbreParentese CARACTERE token\char`_simboloFechaParentese token\char`_simboloPontoVirgula
+	 
 	\item PARAMETROS\char`_FUNCAO : (PARAMETROS\char`_FUNCAO token\char`_simboloVirgula+)? EXPRESSAO | (PARAMETROS\char`_FUNCAO token\char`_simboloVirgula+)? COMANDO\char`_CHAMADA\char`_FUNCAO
 	\item COMANDO\char`_CHAMADA\char`_FUNCAO : token\char`_identificador token\char`_simboloAbreParentese (PARAMETROS\char`_FUNCAO)? token\char`_simboloFechaParentese
 	\item COMANDO\char`_MAIS\char`_MAIS\char`_MENOS\char`_MENOS : token\char`_identificador token\char`_operadorSomaSoma token\char`_simboloPontoVirgula |  token\char`_operadorSomaSoma token\char`_identificador token\char`_simboloPontoVirgula | token\char`_identificador token\char`_operadorSubtraiSubtrai token\char`_simboloPontoVirgula | token\char`_operadorSubtraiSubtrai token\char`_identificador token\char`_simboloPontoVirgula
@@ -350,6 +352,8 @@ Em relação ao analisador sintático desenvolvido no trabalho passado, a gramá
 Após a conclusão com sucesso das três etapas de análise do código a ser compilado, chega-se na fase de síntese através da rotina de gerar um código intermediário que consiste em transformar os comandos inseridos pelo usuário no arquivo fonte em algo passível de execução.
 
 Todos os comandos presentes no arquivo são mapeados, de forma ordenada, em uma estrutura de dados no formato de árvore. Essa estrutura se comporta tanto com uma árvore como uma lista, uma vez que cada comando está associado ao seu predecessor.
+
+Todos os programas compilados dentro do interpretador são mantidos em memória e caso um mesmo programa seja compilado mais de uma vez, a sua árvore de execução é trocada pela mais recente. Em caso de algum erro léxico, sintático ou semântico na compilação de um programa, os outros não sofrem nenhum impacto.
 
 
 \end{document}
