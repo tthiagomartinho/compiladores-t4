@@ -140,11 +140,11 @@ Nosso analisador léxico identificará os seguintes elementos como caracteres es
 
 \section{Analisador Sintático}
 
-Um analisador sintático consiste em verificar a sintaxe de um programa escrito em uma determinada linguagem. Caso o código esteja totalmente de acordo com a gramática estabelecidao, nenhuma mensagem de erro é mostrada para o usuário, caso contrário, é informado qual a linha apresenta um erro de sintaxe.
+Um analisador sintático consiste em verificar a sintaxe de um programa escrito em uma determinada linguagem. Caso o código esteja totalmente de acordo com a gramática estabelecida, nenhuma mensagem de erro é mostrada para o usuário, caso contrário, é informado qual a linha apresenta um erro de sintaxe.
 
 Esses possíveis erros podem ser de natureza diferente como, por exemplo, utilização de palavras reservadas de forma diferente do contexto que elas devem ser empregadas, comandos incompletos, falta de ponto e virgula, entre outros. 
 
-A ferramenta Bison (\url{https://www.gnu.org/software/bison/}) é um gerador de interpretadores que analisa a sintaxe de um arquivo de entrada. Segundo a descrição presente no site da ferramenta, ela se intitula como \textit{um gerador de interpretadores para fins gerais que converte uma descrição gramatical de uma gramática livre de contexto "LALR(1)" para um programa C que analisa aquela gramática. Uma vez que você esteja acostumado com "Bison", você pode usá-lo para desenvolver um ampla quantidade de interpretadores de linguagem, daqueles usados em simples calculadoras de mesa até linguagens de programação complexas.}
+A ferramenta Bison (\url{https://www.gnu.org/software/bison/}) é um gerador de interpretadores que analisa a sintaxe de um arquivo de entrada. Segundo a descrição presente no site da ferramenta, ela se intitula como \textit{um gerador de interpretadores para fins gerais que converte uma descrição gramatical de uma gramática livre de contexto "LALR(1)" para um programa C que analisa aquela gramática. Uma vez que você esteja acostumado com "Bison", você pode usá-lo para desenvolver uma ampla quantidade de interpretadores de linguagem, daqueles usados em simples calculadoras de mesa até linguagens de programação complexas.}
 
 Com o auxilio dessa ferramenta, em parceria com o Flex, foi construído neste trabalho um analisador sintático para a linguagem GPortugol de acordo coma  gramática definida por nós.
 
@@ -181,14 +181,13 @@ As chamadas de funções podem conter expressões, outras funções, variáveis,
 
 \subsection{Atribuições}
 \label{atribuicoes}
-Nosso analisador sintático verificará tanto operações aritméticas como operações lógicas (ou relacionais). Durante essa fase de avaliação do compilador, expressões que podem não fazer sentido também são aceitas, uma vez que estão escritas na forma correta. O sentido da expressão será avaliado no próximo trabalho (analisador semântico). Não são aceitas operações que incluem chamadas de funções combinadas com expressões aritméticas ou lógicas como por exemplo \textit{x + fatorial(2);} e nem expressões que envolvem os operadores \textit{++} ou \textit{$-$$-$}.
+Nosso analisador sintático verificará tanto operações aritméticas como operações lógicas (ou relacionais). Nesse trabalho, as expressões serão analisadas pelo analisador semântico. Não são aceitas operações que incluem chamadas de funções combinadas com expressões aritméticas ou lógicas como por exemplo \textit{x + fatorial(2);} ou expressões que não fazem sentido.
 
-Alguns exemplos de expressões incorretas mas que são aceitas pelo analisador sintático são:
-
+Alguns exemplos de expressões incorretas que não são aceitas pelo analisador sintático:
 
 \begin{math}
 	\mathit{x = verdadeiro ^ 3;}
-\end{math}
+\end{math}s
 
 \begin{math}
 	\mathit{x = 10 + verdadeiro;}
@@ -328,7 +327,7 @@ Duas funções não podem ter o mesmo nome, se este caso existir nosso programa 
 Para os retornos de função ou elas retornam o tipo \textit{void} ou elas retornam um outro tipo qualquer. Uma função do tipo \textit{inteiro} só poderá ter como retorno um variável desse tipo, caso contrário será identificado um erro no comando retorno. Da mesma forma, se uma função não possuir um tipo e tiver como retorno uma variável do tipo \textit{inteiro} nosso programa informará um erro.
 
 \subsection{Chamada de função}
-Quando declaramos uma função informamos qual o tipo de retorno dela, qual seu nome e quais são os parâmetros que estamos esperando. Quando chamamos uma função devemos prestar atenção em duas coisas, a primeira delas é se a função existe, ou seja, não podemos chamar a função \textit{dobrar} se a mesma não tiver sido declarada anteriormente no programa. Em segundo lugar se a função espera dois parâmetros e passarmos somente um, ou se a função espera valores do tipo \textit{inteiro} e passarmos valores do tipo \textit{logico} nossa chamada de função estará incorreta. Nosso programa deverá identificar esses dois erros e informar ao usuário a linha na qual esse erros ocorreram, especificando qual tipo de erro ocorreu (" Função não declarada " ou " parâmetros passados na chamada de função não condizem com a declaração ").
+Quando declaramos uma função informamos qual o tipo de retorno dela, qual seu nome e quais são os parâmetros que estamos esperando. Quando chamamos uma função devemos prestar atenção em duas coisas, a primeira delas é se a função existe, ou seja, não podemos chamar a função \textit{dobrar} se a mesma não tiver sido declarada anteriormente no programa. Em segundo lugar se a função espera dois parâmetros e passarmos somente um, ou se a função espera valores do tipo \textit{inteiro} e passarmos valores do tipo \textit{lógico} nossa chamada de função estará incorreta. Nosso programa deverá identificar esses dois erros e informar ao usuário a linha na qual esse erros ocorreram, especificando qual tipo de erro ocorreu (" Função não declarada " ou " parâmetros passados na chamada de função não condizem com a declaração ").
 
 \subsection{Atribuição de tipos diferentes}
 Uma variável do tipo \textit{inteiro} não pode receber o valor \textit{verdadeiro}, por exemplo, da mesma forma que uma variável do tipo \textit{logico} não pode receber um número ou algo do tipo. Logo quando houver esse tipo de erro nosso programa o identificará e mostrará a linha que esse erro ocorre.
